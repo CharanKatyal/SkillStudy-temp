@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, XCircle, HelpCircle, ArrowRight, RotateCcw, Trophy, Check } from 'lucide-react';
+import { CheckCircle2, XCircle, ArrowRight, RotateCcw, Trophy, Check } from 'lucide-react';
 import { PracticeQuestion, PracticeAttempt } from '../../types';
 import { useData } from '../../context/DataContext';
 import { Modal } from '../common/Modal';
@@ -75,7 +75,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({
       setIsAnswerSubmitted(false);
     } else {
       // Complete quiz
-      const finalScore = score + (isAnswerSubmitted && answersHistory[answersHistory.length - 1]?.isCorrect ? 0 : 0);
       const accuracy = Math.round((score / questions.length) * 100);
 
       const attempt: PracticeAttempt = {
@@ -107,40 +106,38 @@ export const QuizModal: React.FC<QuizModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="2xl">
       {isCompleted ? (
-        <div className="text-center py-6 space-y-6">
-          <div className="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 mx-auto flex items-center justify-center border border-amber-500/40">
+        <div className="text-center py-6 space-y-5 animate-fadeIn">
+          <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700/60 flex items-center justify-center mx-auto text-amber-500 shadow-md">
             <Trophy className="w-8 h-8" />
           </div>
 
           <div>
-            <h3 className="text-2xl font-bold text-slate-100">Practice Session Complete! 🎉</h3>
-            <p className="text-sm text-slate-400 mt-1">
-              Your results are saved locally in your progress history.
-            </p>
+            <h3 className="text-xl font-extrabold text-slate-900 dark:text-slate-100">Quiz Completed!</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Your practice score has been saved to your local profile.</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto">
-            <div className="p-4 rounded-xl bg-slate-850 border border-slate-800">
-              <span className="text-xs text-slate-400">Final Score</span>
-              <p className="text-2xl font-bold text-slate-100 mt-1">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-w-xs mx-auto grid grid-cols-2 gap-4">
+            <div>
+              <span className="text-xs text-slate-500 dark:text-slate-400">Score</span>
+              <div className="text-2xl font-bold text-brand-600 dark:text-brand-400">
                 {score} / {questions.length}
-              </p>
+              </div>
             </div>
-            <div className="p-4 rounded-xl bg-slate-850 border border-slate-800">
-              <span className="text-xs text-slate-400">Accuracy</span>
-              <p className="text-2xl font-bold text-emerald-400 mt-1">
+            <div>
+              <span className="text-xs text-slate-500 dark:text-slate-400">Accuracy</span>
+              <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                 {Math.round((score / questions.length) * 100)}%
-              </p>
+              </div>
             </div>
           </div>
 
-          <div className="flex gap-3 justify-center pt-4">
+          <div className="flex gap-3 justify-center pt-2">
             <button
               onClick={handleRestart}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold flex items-center gap-2 border border-slate-700 transition"
+              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Retry Session</span>
+              <span>Retry Quiz</span>
             </button>
             <button
               onClick={onClose}
@@ -152,47 +149,46 @@ export const QuizModal: React.FC<QuizModalProps> = ({
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Header info */}
-          <div className="flex items-center justify-between text-xs text-slate-400 pb-2 border-b border-slate-800">
-            <span>
-              Question <strong className="text-slate-200">{currentIndex + 1}</strong> of {questions.length}
-            </span>
+          {/* Progress Header */}
+          <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 text-xs">
             <div className="flex items-center gap-2">
               <Badge variant="info">{currentQ.type.replace('_', ' ')}</Badge>
-              <span className="font-semibold text-emerald-400">Score: {score}</span>
+              <span className="text-slate-500 dark:text-slate-400 font-semibold">{currentQ.topicTitle}</span>
             </div>
+            <span className="font-bold text-slate-700 dark:text-slate-300">
+              Question {currentIndex + 1} of {questions.length}
+            </span>
           </div>
 
-          {/* Question Text */}
-          <div className="space-y-3">
-            <h4 className="text-base sm:text-lg font-bold text-slate-100 leading-snug">
+          {/* Question Body */}
+          <div className="space-y-4">
+            <h4 className="text-base font-bold text-slate-900 dark:text-slate-100 leading-relaxed">
               {currentQ.question}
             </h4>
 
             {currentQ.codeSnippet && (
-              <pre className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-300 overflow-x-auto">
+              <pre className="p-4 rounded-xl bg-slate-950 text-emerald-300 text-xs font-mono overflow-x-auto border border-slate-800">
                 <code>{currentQ.codeSnippet}</code>
               </pre>
             )}
-          </div>
 
-          {/* Options / Input */}
-          <div className="space-y-2.5">
+            {/* MCQ & True/False Options */}
             {currentQ.options && (
               <div className="space-y-2">
                 {currentQ.options.map((opt, idx) => {
-                  let optStyle = 'bg-slate-850 border-slate-800 text-slate-200 hover:bg-slate-800';
+                  const isSelected = selectedOption === idx;
+                  const isCorrect = Number(currentQ.correctAnswer) === idx;
+
+                  let optClass = 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-brand-500';
 
                   if (isAnswerSubmitted) {
-                    if (idx === Number(currentQ.correctAnswer)) {
-                      optStyle = 'bg-emerald-950/80 border-emerald-600 text-emerald-200';
-                    } else if (selectedOption === idx) {
-                      optStyle = 'bg-rose-950/80 border-rose-600 text-rose-200';
-                    } else {
-                      optStyle = 'bg-slate-900 border-slate-800 text-slate-500 opacity-60';
+                    if (isCorrect) {
+                      optClass = 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-200 font-bold';
+                    } else if (isSelected && !isCorrect) {
+                      optClass = 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-800 dark:text-rose-200';
                     }
-                  } else if (selectedOption === idx) {
-                    optStyle = 'bg-brand-950/60 border-brand-500 text-brand-200 font-semibold';
+                  } else if (isSelected) {
+                    optClass = 'bg-brand-50 dark:bg-brand-950/60 border-brand-500 text-brand-800 dark:text-brand-300 font-bold';
                   }
 
                   return (
@@ -200,14 +196,11 @@ export const QuizModal: React.FC<QuizModalProps> = ({
                       key={idx}
                       disabled={isAnswerSubmitted}
                       onClick={() => setSelectedOption(idx)}
-                      className={`w-full text-left p-3.5 rounded-xl border text-xs sm:text-sm transition flex items-center justify-between ${optStyle}`}
+                      className={`w-full p-3.5 rounded-xl border text-left text-xs transition flex items-center justify-between ${optClass}`}
                     >
                       <span>{opt}</span>
-                      {isAnswerSubmitted && idx === Number(currentQ.correctAnswer) && (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      )}
-                      {isAnswerSubmitted && selectedOption === idx && idx !== Number(currentQ.correctAnswer) && (
-                        <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                      {isAnswerSubmitted && isCorrect && (
+                        <Check className="w-4 h-4 text-emerald-500 shrink-0" />
                       )}
                     </button>
                   );
@@ -215,51 +208,52 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               </div>
             )}
 
+            {/* Short Answer Input */}
             {currentQ.type === 'short_answer' && (
-              <div className="space-y-3">
+              <div>
                 <input
                   type="text"
                   disabled={isAnswerSubmitted}
                   value={shortAnswerInput}
                   onChange={e => setShortAnswerInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleSubmitAnswer(); }}
                   placeholder="Type your exact answer here..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm text-slate-100 focus:outline-none focus:border-brand-500"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-brand-500 transition"
                 />
+              </div>
+            )}
+
+            {/* Explanation box after submitting */}
+            {isAnswerSubmitted && (
+              <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs space-y-1.5 animate-fadeIn">
+                <span className="font-bold text-slate-900 dark:text-slate-200">Explanation:</span>
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{currentQ.explanation}</p>
               </div>
             )}
           </div>
 
-          {/* Explanation Box when Answer Submitted */}
-          {isAnswerSubmitted && (
-            <div className="p-4 rounded-xl bg-slate-850/90 border border-slate-750 text-xs space-y-1.5 animate-fadeIn">
-              <span className="font-bold text-slate-200 flex items-center gap-1.5">
-                <HelpCircle className="w-3.5 h-3.5 text-sky-400" />
-                <span>Explanation</span>
-              </span>
-              <p className="text-slate-300 leading-relaxed">{currentQ.explanation}</p>
-            </div>
-          )}
+          {/* Modal Footer Controls */}
+          <div className="flex justify-between items-center pt-4 border-t border-slate-200 dark:border-slate-800">
+            <span className="text-xs text-slate-500 dark:text-slate-400">Current Score: {score}</span>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-2">
-            {!isAnswerSubmitted ? (
-              <button
-                onClick={handleSubmitAnswer}
-                disabled={selectedOption === null && !shortAnswerInput.trim()}
-                className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 disabled:pointer-events-none text-white text-xs font-bold shadow-md transition"
-              >
-                Submit Answer
-              </button>
-            ) : (
-              <button
-                onClick={handleNextQuestion}
-                className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-2 shadow-md transition"
-              >
-                <span>{currentIndex < questions.length - 1 ? 'Next Question' : 'View Results'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            )}
+            <div>
+              {!isAnswerSubmitted ? (
+                <button
+                  onClick={handleSubmitAnswer}
+                  disabled={selectedOption === null && !shortAnswerInput.trim()}
+                  className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white text-xs font-bold shadow-md transition"
+                >
+                  Submit Answer
+                </button>
+              ) : (
+                <button
+                  onClick={handleNextQuestion}
+                  className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition"
+                >
+                  <span>{currentIndex < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

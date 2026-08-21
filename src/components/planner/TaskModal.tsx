@@ -71,51 +71,51 @@ export const TaskModal: React.FC<TaskModalProps> = ({
       title={taskToEdit ? 'Edit Study Task' : 'Add Study Task'}
       maxWidth="md"
     >
-      <form onSubmit={handleSave} className="space-y-4">
+      <form onSubmit={handleSave} className="space-y-4 text-xs">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">Task Title</label>
+          <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Task Title</label>
           <input
             type="text"
             required
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="e.g. Practice HTML Semantic Layouts"
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-500"
+            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-brand-500"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Date</label>
+            <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Date</label>
             <input
               type="date"
               required
               value={date}
               onChange={e => setDate(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Duration (Mins)</label>
+            <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Duration (Mins)</label>
             <input
               type="number"
               min="5"
               step="5"
               value={durationMinutes}
               onChange={e => setDurationMinutes(Number(e.target.value))}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Category</label>
+            <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Category</label>
             <select
               value={category}
               onChange={e => setCategory(e.target.value as PlannerCategory)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none"
             >
               <option value="Academic">Academic</option>
               <option value="Skill">Skill</option>
@@ -126,11 +126,11 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Priority</label>
+            <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Priority</label>
             <select
               value={priority}
               onChange={e => setPriority(e.target.value as PlannerPriority)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -140,27 +140,27 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">Notes (Optional)</label>
+          <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Notes (Optional)</label>
           <textarea
             value={notes}
             onChange={e => setNotes(e.target.value)}
             placeholder="Key concepts or objectives for this session..."
             rows={2}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none resize-none"
+            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2 text-slate-900 dark:text-slate-100 focus:outline-none resize-none"
           />
         </div>
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+        <div className="flex justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold"
+            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 font-bold"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-md transition"
+            className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold shadow-md transition"
           >
             Save Task
           </button>

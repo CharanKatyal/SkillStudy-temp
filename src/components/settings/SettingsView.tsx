@@ -36,7 +36,6 @@ export const SettingsView: React.FC = () => {
       bio: bio.trim(),
       gradeLevel: gradeLevel.trim()
     });
-    addToast('Profile Saved', 'Your student profile has been updated.', 'success');
   };
 
   const handleThemeChange = (theme: 'dark' | 'light' | 'system') => {
@@ -108,8 +107,8 @@ export const SettingsView: React.FC = () => {
     <div className="space-y-6 max-w-4xl mx-auto animate-fadeIn">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Settings</h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">Settings</h2>
+        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
           Customize your student profile, visual theme, code editor configurations, and data backups.
         </p>
       </div>
@@ -124,7 +123,7 @@ export const SettingsView: React.FC = () => {
         <form onSubmit={handleProfileSave} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Display Name</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Display Name</label>
               <input
                 type="text"
                 value={displayName}
@@ -134,7 +133,7 @@ export const SettingsView: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Grade Level / Track</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Grade Level / Track</label>
               <input
                 type="text"
                 value={gradeLevel}
@@ -146,7 +145,7 @@ export const SettingsView: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Bio</label>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Bio</label>
             <textarea
               value={bio}
               onChange={e => setBio(e.target.value)}
@@ -183,7 +182,7 @@ export const SettingsView: React.FC = () => {
             }`}
           >
             <Moon className="w-5 h-5" />
-            <span className="text-xs font-semibold">Dark Theme</span>
+            <span className="text-xs font-bold">Dark Theme</span>
           </button>
 
           <button
@@ -196,7 +195,7 @@ export const SettingsView: React.FC = () => {
             }`}
           >
             <Sun className="w-5 h-5 text-amber-500" />
-            <span className="text-xs font-semibold">Light Theme</span>
+            <span className="text-xs font-bold">Light Theme</span>
           </button>
 
           <button
@@ -209,7 +208,7 @@ export const SettingsView: React.FC = () => {
             }`}
           >
             <Laptop className="w-5 h-5" />
-            <span className="text-xs font-semibold">System Default</span>
+            <span className="text-xs font-bold">System Default</span>
           </button>
         </div>
       </Card>
@@ -223,7 +222,7 @@ export const SettingsView: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div>
-            <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+            <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
               Editor Font Size: {settings?.editor?.fontSize || 14}px
             </label>
             <input
@@ -238,7 +237,7 @@ export const SettingsView: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Tab Size</label>
+            <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Tab Size</label>
             <select
               value={settings?.editor?.tabSize || 2}
               onChange={e => handleEditorChange('tabSize', Number(e.target.value))}
@@ -250,7 +249,7 @@ export const SettingsView: React.FC = () => {
           </div>
 
           <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-            <span className="text-slate-700 dark:text-slate-300 font-semibold">Show Line Numbers</span>
+            <span className="text-slate-700 dark:text-slate-300 font-bold">Show Line Numbers</span>
             <input
               type="checkbox"
               checked={settings?.editor?.lineNumbers ?? true}
@@ -260,7 +259,7 @@ export const SettingsView: React.FC = () => {
           </div>
 
           <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-            <span className="text-slate-700 dark:text-slate-300 font-semibold">Word Wrap</span>
+            <span className="text-slate-700 dark:text-slate-300 font-bold">Word Wrap</span>
             <input
               type="checkbox"
               checked={settings?.editor?.wordWrap ?? true}
@@ -327,14 +326,14 @@ export const SettingsView: React.FC = () => {
       >
         <div className="space-y-4 text-center">
           <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">Are you sure?</h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
             This will erase all progress, notes, code files, and planner tasks stored in this browser.
           </p>
 
           <div className="flex gap-3 justify-center pt-2">
             <button
               onClick={() => setIsResetModalOpen(false)}
-              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold"
+              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold"
             >
               Cancel
             </button>

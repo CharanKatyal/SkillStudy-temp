@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import {
-  CheckCircle2,
-  HelpCircle,
   Play,
   RotateCcw,
   Target,
@@ -55,17 +53,17 @@ export const PracticeView: React.FC = () => {
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Header Banner */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-850 to-slate-900 border border-slate-750 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-lg">
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-brand-50/60 via-white to-white dark:from-slate-850 dark:via-slate-850 dark:to-slate-900 border border-slate-200 dark:border-slate-750 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
         <div className="space-y-2">
-          <h2 className="text-2xl font-extrabold text-slate-100">Practice &amp; Assessment Hub</h2>
-          <p className="text-sm text-slate-300 max-w-xl leading-relaxed">
+          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">Practice Hub</h2>
+          <p className="text-sm text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">
             Reinforce academic theories and coding fundamentals through MCQs, True/False, Short answers, and Code quizzes.
           </p>
         </div>
 
         <button
           onClick={() => startQuiz('Complete Practice Marathon', PRACTICE_QUESTIONS, 'all')}
-          className="px-5 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-brand-900/40 shrink-0 transition"
+          className="px-5 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shrink-0 transition"
         >
           <Play className="w-4 h-4 fill-current" />
           <span>Start Full Quiz Session</span>
@@ -80,8 +78,8 @@ export const PracticeView: React.FC = () => {
             onClick={() => setSelectedFilter(s.id)}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
               selectedFilter === s.id
-                ? 'bg-brand-600 text-white shadow-lg shadow-brand-900/30'
-                : 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                ? 'bg-brand-600 text-white shadow-md'
+                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700'
             }`}
           >
             {s.name}
@@ -94,85 +92,83 @@ export const PracticeView: React.FC = () => {
         {/* Question Sets List */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-slate-200">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-200">
               Questions ({filteredQuestions.length})
             </h3>
             {filteredQuestions.length > 0 && (
               <button
                 onClick={() =>
                   startQuiz(
-                    `${selectedFilter === 'All' ? 'Mixed' : selectedFilter} Practice`,
+                    selectedFilter === 'All' ? 'Filtered Questions' : `${selectedFilter} Quiz`,
                     filteredQuestions,
                     selectedFilter
                   )
                 }
-                className="text-xs font-semibold text-brand-400 hover:text-brand-300 flex items-center gap-1"
+                className="px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
               >
-                <Play className="w-3.5 h-3.5" />
-                <span>Practice These Questions</span>
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Launch Quiz</span>
               </button>
             )}
           </div>
 
           <div className="space-y-3">
             {filteredQuestions.map((q, idx) => (
-              <Card key={q.id} className="p-4 space-y-2 border-slate-800">
-                <div className="flex items-start justify-between gap-2">
+              <Card key={q.id} className="p-4 flex items-start justify-between gap-4">
+                <div className="space-y-1.5 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center text-[10px] font-bold">
-                      {idx + 1}
-                    </span>
-                    <Badge size="sm" variant="info">{q.type.replace('_', ' ')}</Badge>
-                    <span className="text-xs text-slate-400 capitalize">{q.subjectOrSkillId}</span>
+                    <Badge variant="info">
+                      {q.type.replace('_', ' ')}
+                    </Badge>
                   </div>
-                  {q.topicTitle && <Badge size="sm">{q.topicTitle}</Badge>}
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 leading-snug">
+                    <span className="text-brand-600 dark:text-brand-400 font-bold mr-1.5">Q{idx + 1}.</span>
+                    {q.question}
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                    Topic: {q.topicTitle}
+                  </p>
                 </div>
 
-                <h4 className="text-sm font-semibold text-slate-100">{q.question}</h4>
-
-                {q.codeSnippet && (
-                  <pre className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-emerald-300 overflow-x-auto">
-                    <code>{q.codeSnippet}</code>
-                  </pre>
-                )}
+                <button
+                  onClick={() => startQuiz(q.question, [q], q.subjectOrSkillId)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-slate-700 dark:text-slate-300 text-xs font-bold shrink-0 transition"
+                >
+                  Practice
+                </button>
               </Card>
             ))}
           </div>
         </div>
 
-        {/* Practice History Sidebar */}
+        {/* Practice History Column */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <History className="w-4 h-4 text-purple-400" />
-            <h3 className="text-base font-bold text-slate-200">Recent Attempts</h3>
+          <div className="flex items-center gap-2 text-slate-900 dark:text-slate-200">
+            <History className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+            <h3 className="text-base font-bold">Recent Attempts</h3>
           </div>
 
           {practiceAttempts.length === 0 ? (
-            <Card className="text-center py-8 text-slate-400 text-xs">
-              <p>No practice attempts yet. Take a quiz to record your accuracy!</p>
+            <Card className="p-6 text-center text-slate-500 dark:text-slate-400 text-xs space-y-2">
+              <FileQuestion className="w-8 h-8 mx-auto text-slate-400" />
+              <p className="font-semibold text-slate-700 dark:text-slate-300">No attempts recorded yet</p>
+              <p>Complete quizzes to see your score history and accuracy analytics!</p>
             </Card>
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {practiceAttempts.slice(0, 8).map(att => (
-                <Card key={att.id} className="p-3.5 flex items-center justify-between border-slate-800">
-                  <div>
-                    <h5 className="text-xs font-bold text-slate-200">{att.subjectOrSkillName}</h5>
-                    <p className="text-[10px] text-slate-500 mt-0.5">
-                      {new Date(att.date).toLocaleDateString()} • {att.score} / {att.totalQuestions} correct
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span
-                      className={`text-xs font-bold ${
-                        att.accuracy >= 80
-                          ? 'text-emerald-400'
-                          : att.accuracy >= 60
-                          ? 'text-amber-400'
-                          : 'text-rose-400'
-                      }`}
-                    >
-                      {att.accuracy}%
+                <Card key={att.id} className="p-3.5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900 dark:text-slate-200 truncate mr-2">
+                      {att.subjectOrSkillName}
                     </span>
+                    <Badge variant={att.accuracy >= 80 ? 'success' : 'warning'} size="sm">
+                      {att.accuracy}%
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                    <span>{att.score} / {att.totalQuestions} correct</span>
+                    <span>{new Date(att.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                   </div>
                 </Card>
               ))}
@@ -181,9 +177,10 @@ export const PracticeView: React.FC = () => {
         </div>
       </div>
 
+      {/* Interactive Quiz Assessment Modal */}
       <QuizModal
         isOpen={activeQuizMeta.isOpen}
-        onClose={() => setActiveQuizMeta(prev => ({ ...prev, isOpen: false }))}
+        onClose={() => setActiveQuizMeta({ ...activeQuizMeta, isOpen: false })}
         title={activeQuizMeta.title}
         questions={activeQuizMeta.questions}
         subjectOrSkillId={activeQuizMeta.subjectOrSkillId}

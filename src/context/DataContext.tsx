@@ -139,7 +139,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateSettings = async (newSettings: UserSettings) => {
     await storageService.saveSettings(newSettings);
     setSettings(newSettings);
-    addToast('Settings Saved', 'Application preferences have been updated.', 'success');
   };
 
   const markLessonComplete = async (lessonId: string) => {
