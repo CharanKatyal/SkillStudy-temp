@@ -2,6 +2,7 @@ import React from 'react';
 import { Menu, Flame, Code2, Moon, Sun, User } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useData } from '../../context/DataContext';
+import { SyncStatusIndicator } from '../sync/SyncStatusIndicator';
 
 interface HeaderProps {
   onToggleMobileMenu: () => void;
@@ -53,14 +54,18 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Phase 2: Cloud Sync Status & Auth */}
+        <SyncStatusIndicator />
+
         {/* Streak Counter */}
         <div
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-950/60 border border-amber-800/60 text-amber-300 text-xs font-semibold"
           title={`${progress?.streak?.current || 1} Day Learning Streak`}
         >
           <Flame className="w-4 h-4 text-amber-400 animate-pulse" />
-          <span>{progress?.streak?.current || 1}d streak</span>
+          <span className="hidden sm:inline">{progress?.streak?.current || 1}d streak</span>
+          <span className="sm:hidden">{progress?.streak?.current || 1}d</span>
         </div>
 
         {/* Quick IDE button */}
@@ -69,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold border border-slate-700 transition"
         >
           <Code2 className="w-4 h-4 text-brand-400" />
-          <span>Open IDE</span>
+          <span>IDE</span>
         </button>
 
         {/* Theme toggle */}

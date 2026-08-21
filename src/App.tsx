@@ -1,5 +1,6 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { DataProvider, useData } from './context/DataContext';
 import { IDEProvider } from './context/IDEContext';
 import { AppLayout } from './components/layout/AppLayout';
@@ -14,6 +15,7 @@ import { ProjectsView } from './components/projects/ProjectsView';
 import { PlannerView } from './components/planner/PlannerView';
 import { PortfolioView } from './components/portfolio/PortfolioView';
 import { AchievementsView } from './components/achievements/AchievementsView';
+import { ParentPortalView } from './components/sync/ParentPortalView';
 import { SettingsView } from './components/settings/SettingsView';
 
 const MainViewRouter: React.FC = () => {
@@ -52,6 +54,8 @@ const MainViewRouter: React.FC = () => {
       return <PortfolioView />;
     case 'achievements':
       return <AchievementsView />;
+    case 'parent':
+      return <ParentPortalView />;
     case 'settings':
       return <SettingsView />;
     default:
@@ -62,13 +66,15 @@ const MainViewRouter: React.FC = () => {
 export function App() {
   return (
     <AppProvider>
-      <DataProvider>
-        <IDEProvider>
-          <AppLayout>
-            <MainViewRouter />
-          </AppLayout>
-        </IDEProvider>
-      </DataProvider>
+      <AuthProvider>
+        <DataProvider>
+          <IDEProvider>
+            <AppLayout>
+              <MainViewRouter />
+            </AppLayout>
+          </IDEProvider>
+        </DataProvider>
+      </AuthProvider>
     </AppProvider>
   );
 }

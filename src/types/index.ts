@@ -9,6 +9,7 @@ export type NavSection =
   | 'planner'
   | 'portfolio'
   | 'achievements'
+  | 'parent'
   | 'settings';
 
 export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced';

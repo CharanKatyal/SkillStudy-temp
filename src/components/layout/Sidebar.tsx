@@ -11,11 +11,13 @@ import {
   Briefcase,
   Trophy,
   Settings,
+  Heart,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
 import { NavSection } from '../../types';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -31,8 +33,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setMobileOpen
 }) => {
   const { activeNav, setActiveNav } = useApp();
+  const { isParent } = useAuth();
 
-  const navItems: { id: NavSection; label: string; icon: React.FC<{ className?: string }>; badge?: string }[] = [
+  const navItems: { id: NavSection | 'parent'; label: string; icon: React.FC<{ className?: string }> }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'academics', label: 'Academics', icon: GraduationCap },
     { id: 'skills', label: 'Skills', icon: Sparkles },
@@ -43,6 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'planner', label: 'Planner', icon: CalendarCheck },
     { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
     { id: 'achievements', label: 'Achievements', icon: Trophy },
+    ...(isParent ? [{ id: 'parent' as const, label: 'Parent Portal', icon: Heart }] : []),
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -76,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   StillSkudy
                 </span>
                 <span className="text-[10px] text-emerald-400 font-medium tracking-wide uppercase">
-                  Offline Learning
+                  Offline &amp; Cloud PWA
                 </span>
               </div>
             )}
@@ -101,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 key={item.id}
                 onClick={() => {
-                  setActiveNav(item.id);
+                  setActiveNav(item.id as NavSection);
                   setMobileOpen(false);
                 }}
                 className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl font-medium text-sm transition group relative ${
@@ -125,14 +129,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </nav>
 
-        {/* Local Storage Indicator Footer */}
+        {/* Local Storage / Cloud Indicator Footer */}
         <div className="p-3 border-t border-slate-800 bg-slate-950/40">
           <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-400 text-xs">
             <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
             {!collapsed && (
               <div className="truncate">
-                <p className="text-[11px] font-semibold text-slate-200">Local Device</p>
-                <p className="text-[10px] text-slate-500">100% Offline</p>
+                <p className="text-[11px] font-semibold text-slate-200">Local Device Active</p>
+                <p className="text-[10px] text-slate-500">IndexedDB Engine</p>
               </div>
             )}
           </div>
