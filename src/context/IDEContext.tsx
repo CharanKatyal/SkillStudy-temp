@@ -1,13 +1,21 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { IdeProject, IdeFile, ProjectTemplate } from '../types';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef
+} from 'react';
+import { IdeProject, IdeFile, ProjectTemplate, SupportedLanguage } from '../types';
+import { PROJECT_TEMPLATES } from '../data/projectTemplates';
 import { useData } from './DataContext';
 import { useApp } from './AppContext';
-import { PROJECT_TEMPLATES } from '../data/projectTemplates';
 import { backupService } from '../services/backupService';
+import { codeRunnerService } from '../services/codeRunnerService';
 
 export interface ConsoleLogMessage {
   id: string;
-  type: 'log' | 'warn' | 'error' | 'info';
+  type: 'log' | 'info' | 'warn' | 'error';
   message: string;
   timestamp: string;
 }
@@ -17,30 +25,35 @@ interface IDEContextType {
   activeFileName: string;
   openTabs: string[];
   consoleLogs: ConsoleLogMessage[];
-  isRunning: boolean;
   previewUrl: string;
+  isRunning: boolean;
   isSaving: boolean;
   hasUnsavedChanges: boolean;
   activeChallengeId: string | null;
-  setActiveChallengeId: (id: string | null) => void;
-  loadProject: (projectId: string) => void;
-  createNewProjectFromTemplate: (templateId: string, customName?: string) => Promise<IdeProject>;
-  createNewBlankProject: (name: string) => Promise<IdeProject>;
+
+  // Actions
   setActiveFileName: (name: string) => void;
   openFileInTab: (name: string) => void;
   closeTab: (name: string) => void;
-  updateFileContent: (filename: string, content: string) => void;
-  createFile: (filename: string, language?: IdeFile['language']) => void;
+  updateFileContent: (name: string, content: string) => void;
+  createFile: (name: string, language?: SupportedLanguage) => void;
+  deleteFile: (name: string) => void;
   renameFile: (oldName: string, newName: string) => void;
-  deleteFile: (filename: string) => void;
-  runProject: () => void;
-  stopProject: () => void;
-  clearConsole: () => void;
+
+  // Project Level Actions
+  createNewBlankProject: (name?: string) => Promise<void>;
+  createFromTemplate: (templateId: string, projectName?: string) => Promise<void>;
+  loadProject: (projectId: string) => void;
   saveCurrentProject: () => Promise<void>;
   resetToTemplate: () => void;
   exportProjectZip: () => Promise<void>;
   exportProjectJson: () => void;
   importProjectZip: (file: File) => Promise<void>;
+
+  // Sandbox Runner
+  runProject: () => void;
+  stopProject: () => void;
+  clearConsole: () => void;
 }
 
 const IDEContext = createContext<IDEContextType | undefined>(undefined);
@@ -53,50 +66,41 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeFileName, setActiveFileName] = useState<string>('index.html');
   const [openTabs, setOpenTabs] = useState<string[]>(['index.html', 'style.css', 'script.js']);
   const [consoleLogs, setConsoleLogs] = useState<ConsoleLogMessage[]>([]);
-  const [isRunning, setIsRunning] = useState<boolean>(true);
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [isRunning, setIsRunning] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
   const [activeChallengeId, setActiveChallengeId] = useState<string | null>(null);
 
-  const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autosaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize first project from database
+  // Initialize with the most recent project or default template
   useEffect(() => {
     if (ideProjects.length > 0 && !currentProject) {
-      const initial = ideProjects[0];
-      setCurrentProject(initial);
-      setActiveFileName(initial.activeFileName || Object.keys(initial.files)[0] || 'index.html');
-      setOpenTabs(initial.openTabs || Object.keys(initial.files).slice(0, 3));
+      const proj = ideProjects[0];
+      setCurrentProject(proj);
+      setActiveFileName(proj.activeFileName || Object.keys(proj.files)[0] || 'index.html');
+      setOpenTabs(proj.openTabs || Object.keys(proj.files));
     }
   }, [ideProjects, currentProject]);
 
-  // Listen to external custom events e.g. "Open in IDE" from lesson or challenge
+  // Listen for external open-ide trigger from lessons
   useEffect(() => {
-    const handleOpenIdeEvent = (e: any) => {
-      const { title, starterFiles, challengeId } = e.detail;
-      if (starterFiles) {
-        const files: Record<string, IdeFile> = {};
-        Object.entries(starterFiles).forEach(([name, val]: [string, any]) => {
-          files[name] = {
-            name,
-            content: typeof val === 'string' ? val : val.content || '',
-            language: typeof val === 'object' && val.language ? val.language : name.endsWith('.html') ? 'html' : name.endsWith('.css') ? 'css' : name.endsWith('.js') ? 'javascript' : 'text'
-          };
-        });
-
+    const handleOpenIdeEvent = async (e: any) => {
+      if (e.detail) {
+        const { title, files, challengeId } = e.detail;
         const newProj: IdeProject = {
-          id: `proj-challenge-${Date.now()}`,
-          name: title || 'Challenge Workspace',
-          description: challengeId ? `Workspace for coding challenge ${challengeId}` : 'Interactive lesson playground',
-          files,
-          activeFileName: Object.keys(files)[0] || 'index.html',
-          openTabs: Object.keys(files).slice(0, 3),
+          id: `proj-${Date.now()}`,
+          name: title || 'Lesson Starter Code',
+          description: `Created for ${title}`,
+          files: files || {},
+          activeFileName: Object.keys(files || {})[0] || 'index.html',
+          openTabs: Object.keys(files || {}),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
 
-        saveIdeProject(newProj);
+        await saveIdeProject(newProj);
         setCurrentProject(newProj);
         setActiveFileName(newProj.activeFileName);
         setOpenTabs(newProj.openTabs);
@@ -162,31 +166,28 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 type: type,
                 message: formatted
               }, "*");
-            } catch(err) {}
+            } catch(e) {}
           }
+          var _origLog = console.log;
+          var _origWarn = console.warn;
+          var _origError = console.error;
+          var _origInfo = console.info;
 
-          var oldLog = console.log;
-          var oldWarn = console.warn;
-          var oldError = console.error;
-          var oldInfo = console.info;
+          console.log = function() { sendLog("log", arguments); _origLog.apply(console, arguments); };
+          console.warn = function() { sendLog("warn", arguments); _origWarn.apply(console, arguments); };
+          console.error = function() { sendLog("error", arguments); _origError.apply(console, arguments); };
+          console.info = function() { sendLog("info", arguments); _origInfo.apply(console, arguments); };
 
-          console.log = function() { sendLog("log", arguments); oldLog.apply(console, arguments); };
-          console.warn = function() { sendLog("warn", arguments); oldWarn.apply(console, arguments); };
-          console.error = function() { sendLog("error", arguments); oldError.apply(console, arguments); };
-          console.info = function() { sendLog("info", arguments); oldInfo.apply(console, arguments); };
-
-          window.onerror = function(message, source, lineno, colno, error) {
-            sendLog("error", ["Runtime Error: " + message + " (Line " + lineno + ")"]);
-            return false;
+          window.onerror = function(msg, url, line) {
+            sendLog("error", ["Uncaught Error: " + msg + " (Line " + line + ")"]);
           };
         })();
       </script>
     `;
 
-    // Inject CSS into <head> and JS into end of <body>
     let doc = htmlFile;
-    if (doc.includes('</head>')) {
-      doc = doc.replace('</head>', `${loggerBridge}\n${cssFiles}\n</head>`);
+    if (doc.includes('<head>')) {
+      doc = doc.replace('<head>', `<head>\n${loggerBridge}\n${cssFiles}`);
     } else {
       doc = `${loggerBridge}\n${cssFiles}\n${doc}`;
     }
@@ -201,19 +202,61 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return doc;
   }, [currentProject]);
 
-  const runProject = useCallback(() => {
+  const runProject = useCallback(async () => {
     setIsRunning(true);
     setConsoleLogs([]);
-    const doc = generatePreviewDoc();
-    const blob = new Blob([doc], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    setPreviewUrl(url);
 
-    // If there is an active challenge, check if completing it
+    const activeFile = currentProject?.files[activeFileName];
+    const isMultiLang = activeFileName.endsWith('.py') || activeFileName.endsWith('.cpp') || activeFileName.endsWith('.java');
+
+    if (isMultiLang && activeFile) {
+      const ext = activeFileName.split('.').pop() || 'js';
+      const result = await codeRunnerService.executeCode(ext, activeFile.content);
+
+      if (result.stdout) {
+        setConsoleLogs(prev => [
+          ...prev,
+          {
+            id: `log-${Date.now()}`,
+            type: 'log',
+            message: result.stdout,
+            timestamp: new Date().toLocaleTimeString()
+          }
+        ]);
+      }
+      if (result.stderr) {
+        setConsoleLogs(prev => [
+          ...prev,
+          {
+            id: `err-${Date.now()}`,
+            type: 'error',
+            message: result.stderr,
+            timestamp: new Date().toLocaleTimeString()
+          }
+        ]);
+      }
+      setConsoleLogs(prev => [
+        ...prev,
+        {
+          id: `info-${Date.now()}`,
+          type: 'info',
+          message: `Execution completed in ${result.executionTimeMs}ms (Exit code 0)`,
+          timestamp: new Date().toLocaleTimeString()
+        }
+      ]);
+    } else {
+      // HTML/CSS/JS Sandbox
+      const doc = generatePreviewDoc();
+      const blob = new Blob([doc], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      setPreviewUrl(url);
+    }
+
+    // If there is an active challenge, mark complete
     if (activeChallengeId) {
       markChallengeComplete(activeChallengeId, currentProject?.files['script.js']?.content || '');
     }
-  }, [generatePreviewDoc, activeChallengeId, markChallengeComplete, currentProject]);
+  }, [generatePreviewDoc, activeChallengeId, markChallengeComplete, currentProject, activeFileName]);
 
   const stopProject = () => {
     setIsRunning(false);
@@ -249,33 +292,182 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsSaving(false);
   };
 
-  // Run automatically when project is initially loaded or changed
-  useEffect(() => {
-    if (currentProject) {
-      runProject();
-    }
-  }, [currentProject?.id]);
+  // Debounced Autosave (1.5 seconds)
+  const scheduleAutosave = useCallback(() => {
+    setHasUnsavedChanges(true);
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    autosaveTimerRef.current = setTimeout(() => {
+      saveCurrentProject();
+    }, 1500);
+  }, [currentProject, activeFileName, openTabs]);
 
-  const loadProject = (projectId: string) => {
-    const found = ideProjects.find(p => p.id === projectId);
-    if (found) {
-      setCurrentProject(found);
-      setActiveFileName(found.activeFileName || Object.keys(found.files)[0] || 'index.html');
-      setOpenTabs(found.openTabs || Object.keys(found.files).slice(0, 3));
-      setActiveChallengeId(null);
+  const updateFileContent = (name: string, content: string) => {
+    if (!currentProject) return;
+    const file = currentProject.files[name];
+    if (!file) return;
+
+    setCurrentProject({
+      ...currentProject,
+      files: {
+        ...currentProject.files,
+        [name]: {
+          ...file,
+          content
+        }
+      }
+    });
+
+    scheduleAutosave();
+  };
+
+  const openFileInTab = (name: string) => {
+    if (!openTabs.includes(name)) {
+      setOpenTabs(prev => [...prev, name]);
+    }
+    setActiveFileName(name);
+  };
+
+  const closeTab = (name: string) => {
+    const nextTabs = openTabs.filter(t => t !== name);
+    setOpenTabs(nextTabs);
+    if (activeFileName === name && nextTabs.length > 0) {
+      setActiveFileName(nextTabs[nextTabs.length - 1]);
     }
   };
 
-  const createNewProjectFromTemplate = async (templateId: string, customName?: string): Promise<IdeProject> => {
-    const template = PROJECT_TEMPLATES.find(t => t.id === templateId) || PROJECT_TEMPLATES[0];
+  const detectLanguageFromName = (name: string): SupportedLanguage => {
+    if (name.endsWith('.html')) return 'html';
+    if (name.endsWith('.css')) return 'css';
+    if (name.endsWith('.js')) return 'javascript';
+    if (name.endsWith('.py')) return 'python';
+    if (name.endsWith('.cpp') || name.endsWith('.cc')) return 'cpp';
+    if (name.endsWith('.java')) return 'java';
+    if (name.endsWith('.json')) return 'json';
+    return 'text';
+  };
+
+  const createFile = (name: string, language?: SupportedLanguage) => {
+    if (!currentProject || !name.trim()) return;
+    const cleanName = name.trim();
+    if (currentProject.files[cleanName]) {
+      addToast('File already exists', `A file named "${cleanName}" already exists.`, 'warning');
+      return;
+    }
+
+    const lang = language || detectLanguageFromName(cleanName);
+    let defaultContent = '';
+    if (lang === 'html') defaultContent = '<!DOCTYPE html>\n<html>\n<head>\n  <title>New Page</title>\n</head>\n<body>\n  <h1>Hello World</h1>\n</body>\n</html>';
+    if (lang === 'css') defaultContent = '/* Stylesheet */\nbody {\n  margin: 0;\n  padding: 1rem;\n}';
+    if (lang === 'javascript') defaultContent = '// JavaScript\nconsole.log("Ready!");';
+    if (lang === 'python') defaultContent = '# Python Script\nprint("Hello from StillSkudy Python Runner!")\n\nfor i in range(1, 4):\n    print(f"Step {i}: Complete")';
+    if (lang === 'cpp') defaultContent = '#include <iostream>\n\nint main() {\n    std::cout << "Hello from C++ WebAssembly Sandbox!" << std::endl;\n    return 0;\n}';
+    if (lang === 'java') defaultContent = 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from Java Sandbox!");\n    }\n}';
+
+    const newFiles = {
+      ...currentProject.files,
+      [cleanName]: {
+        name: cleanName,
+        language: lang,
+        content: defaultContent
+      }
+    };
+
+    const updated = {
+      ...currentProject,
+      files: newFiles
+    };
+
+    setCurrentProject(updated);
+    openFileInTab(cleanName);
+    scheduleAutosave();
+    addToast('File Created', `Added "${cleanName}" to project.`, 'success');
+  };
+
+  const deleteFile = (name: string) => {
+    if (!currentProject) return;
+    if (Object.keys(currentProject.files).length <= 1) {
+      addToast('Cannot Delete', 'Project must retain at least one file.', 'warning');
+      return;
+    }
+
+    const { [name]: removed, ...remainingFiles } = currentProject.files;
+    const remainingNames = Object.keys(remainingFiles);
+
+    setCurrentProject({
+      ...currentProject,
+      files: remainingFiles
+    });
+
+    closeTab(name);
+    if (activeFileName === name) {
+      setActiveFileName(remainingNames[0]);
+    }
+
+    scheduleAutosave();
+    addToast('File Deleted', `Removed "${name}".`, 'info');
+  };
+
+  const renameFile = (oldName: string, newName: string) => {
+    if (!currentProject || !newName.trim() || oldName === newName) return;
+    const cleanNew = newName.trim();
+    if (currentProject.files[cleanNew]) {
+      addToast('Name in use', `A file named "${cleanNew}" already exists.`, 'warning');
+      return;
+    }
+
+    const targetFile = currentProject.files[oldName];
+    const { [oldName]: removed, ...rest } = currentProject.files;
+
+    const lang = detectLanguageFromName(cleanNew);
+    const updatedFiles = {
+      ...rest,
+      [cleanNew]: {
+        ...targetFile,
+        name: cleanNew,
+        language: lang
+      }
+    };
+
+    const updatedTabs = openTabs.map(t => (t === oldName ? cleanNew : t));
+
+    setCurrentProject({
+      ...currentProject,
+      files: updatedFiles,
+      openTabs: updatedTabs
+    });
+
+    setOpenTabs(updatedTabs);
+    if (activeFileName === oldName) {
+      setActiveFileName(cleanNew);
+    }
+
+    scheduleAutosave();
+  };
+
+  const createNewBlankProject = async (name: string = 'Untitled Project') => {
     const newProj: IdeProject = {
       id: `proj-${Date.now()}`,
-      name: customName || template.name,
-      description: template.description,
-      templateId: template.id,
-      files: JSON.parse(JSON.stringify(template.files)),
+      name,
+      description: 'Custom blank project',
+      files: {
+        'index.html': {
+          name: 'index.html',
+          language: 'html',
+          content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Document</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <h1>Welcome to StillSkudy</h1>\n  <p>Start coding!</p>\n  <script src="script.js"></script>\n</body>\n</html>'
+        },
+        'style.css': {
+          name: 'style.css',
+          language: 'css',
+          content: 'body {\n  font-family: system-ui, sans-serif;\n  padding: 2rem;\n  background: #0f172a;\n  color: #f8fafc;\n}'
+        },
+        'script.js': {
+          name: 'script.js',
+          language: 'javascript',
+          content: 'console.log("StillSkudy sandbox ready!");'
+        }
+      },
       activeFileName: 'index.html',
-      openTabs: Object.keys(template.files).slice(0, 3),
+      openTabs: ['index.html', 'style.css', 'script.js'],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -283,186 +475,78 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     await saveIdeProject(newProj);
     setCurrentProject(newProj);
     setActiveFileName('index.html');
+    setOpenTabs(['index.html', 'style.css', 'script.js']);
+    addToast('New Project', `Created "${name}".`, 'success');
+  };
+
+  const createFromTemplate = async (templateId: string, projectName?: string) => {
+    const tmpl = PROJECT_TEMPLATES.find(t => t.id === templateId) || PROJECT_TEMPLATES[0];
+    const name = projectName || tmpl.name;
+
+    const newProj: IdeProject = {
+      id: `proj-${Date.now()}`,
+      name,
+      description: tmpl.description,
+      templateId: tmpl.id,
+      files: JSON.parse(JSON.stringify(tmpl.files)),
+      activeFileName: Object.keys(tmpl.files)[0] || 'index.html',
+      openTabs: Object.keys(tmpl.files),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    await saveIdeProject(newProj);
+    setCurrentProject(newProj);
+    setActiveFileName(newProj.activeFileName);
     setOpenTabs(newProj.openTabs);
-    setActiveChallengeId(null);
-    addToast('New Project Ready', `Created project "${newProj.name}".`, 'success');
-    return newProj;
+    addToast('Template Loaded', `Created project from "${tmpl.name}".`, 'success');
   };
 
-  const createNewBlankProject = async (name: string): Promise<IdeProject> => {
-    const defaultTemplate = PROJECT_TEMPLATES[0];
-    return createNewProjectFromTemplate(defaultTemplate.id, name);
-  };
-
-  const openFileInTab = (filename: string) => {
-    if (!openTabs.includes(filename)) {
-      setOpenTabs(prev => [...prev, filename]);
-    }
-    setActiveFileName(filename);
-  };
-
-  const closeTab = (filename: string) => {
-    const remaining = openTabs.filter(t => t !== filename);
-    setOpenTabs(remaining);
-    if (activeFileName === filename) {
-      setActiveFileName(remaining[0] || Object.keys(currentProject?.files || {})[0] || '');
-    }
-  };
-
-  const updateFileContent = (filename: string, content: string) => {
-    if (!currentProject) return;
-
-    const file = currentProject.files[filename];
-    if (!file) return;
-
-    const updatedFiles = {
-      ...currentProject.files,
-      [filename]: {
-        ...file,
-        content
-      }
-    };
-
-    const updatedProj: IdeProject = {
-      ...currentProject,
-      files: updatedFiles,
-      updatedAt: new Date().toISOString()
-    };
-
-    setCurrentProject(updatedProj);
-    setHasUnsavedChanges(true);
-
-    // Debounced autosave
-    if (autosaveTimeoutRef.current) clearTimeout(autosaveTimeoutRef.current);
-    autosaveTimeoutRef.current = setTimeout(async () => {
-      await saveIdeProject(updatedProj);
-      setHasUnsavedChanges(false);
-    }, 1500);
-  };
-
-  const createFile = (filename: string, language?: IdeFile['language']) => {
-    if (!currentProject) return;
-
-    let lang: IdeFile['language'] = language || 'text';
-    if (!language) {
-      if (filename.endsWith('.html')) lang = 'html';
-      else if (filename.endsWith('.css')) lang = 'css';
-      else if (filename.endsWith('.js')) lang = 'javascript';
-      else if (filename.endsWith('.py')) lang = 'python';
-      else if (filename.endsWith('.json')) lang = 'json';
-    }
-
-    const updatedFiles = {
-      ...currentProject.files,
-      [filename]: {
-        name: filename,
-        content: '',
-        language: lang
-      }
-    };
-
-    const updatedProj: IdeProject = {
-      ...currentProject,
-      files: updatedFiles,
-      updatedAt: new Date().toISOString()
-    };
-
-    setCurrentProject(updatedProj);
-    openFileInTab(filename);
-    saveIdeProject(updatedProj);
-    addToast('File Created', `Created ${filename}`, 'info');
-  };
-
-  const renameFile = (oldName: string, newName: string) => {
-    if (!currentProject || !currentProject.files[oldName] || !newName || oldName === newName) return;
-
-    const file = currentProject.files[oldName];
-    const updatedFiles = { ...currentProject.files };
-    delete updatedFiles[oldName];
-    updatedFiles[newName] = { ...file, name: newName };
-
-    const updatedTabs = openTabs.map(t => (t === oldName ? newName : t));
-
-    const updatedProj: IdeProject = {
-      ...currentProject,
-      files: updatedFiles,
-      activeFileName: activeFileName === oldName ? newName : activeFileName,
-      openTabs: updatedTabs,
-      updatedAt: new Date().toISOString()
-    };
-
-    setCurrentProject(updatedProj);
-    if (activeFileName === oldName) setActiveFileName(newName);
-    setOpenTabs(updatedTabs);
-    saveIdeProject(updatedProj);
-  };
-
-  const deleteFile = (filename: string) => {
-    if (!currentProject || !currentProject.files[filename]) return;
-    if (Object.keys(currentProject.files).length <= 1) {
-      addToast('Cannot Delete', 'A project must have at least one file.', 'warning');
-      return;
-    }
-
-    const updatedFiles = { ...currentProject.files };
-    delete updatedFiles[filename];
-    const updatedTabs = openTabs.filter(t => t !== filename);
-    const newActive = activeFileName === filename ? updatedTabs[0] || Object.keys(updatedFiles)[0] : activeFileName;
-
-    const updatedProj: IdeProject = {
-      ...currentProject,
-      files: updatedFiles,
-      activeFileName: newActive,
-      openTabs: updatedTabs,
-      updatedAt: new Date().toISOString()
-    };
-
-    setCurrentProject(updatedProj);
-    setActiveFileName(newActive);
-    setOpenTabs(updatedTabs);
-    saveIdeProject(updatedProj);
-    addToast('File Deleted', `Removed ${filename}`, 'info');
+  const loadProject = (projectId: string) => {
+    const found = ideProjects.find(p => p.id === projectId);
+    if (!found) return;
+    setCurrentProject(found);
+    setActiveFileName(found.activeFileName || Object.keys(found.files)[0] || 'index.html');
+    setOpenTabs(found.openTabs || Object.keys(found.files));
+    stopProject();
+    setConsoleLogs([]);
   };
 
   const resetToTemplate = () => {
     if (!currentProject || !currentProject.templateId) return;
-    const template = PROJECT_TEMPLATES.find(t => t.id === currentProject.templateId);
-    if (!template) return;
+    const tmpl = PROJECT_TEMPLATES.find(t => t.id === currentProject.templateId);
+    if (!tmpl) return;
 
-    const updatedProj: IdeProject = {
+    setCurrentProject({
       ...currentProject,
-      files: JSON.parse(JSON.stringify(template.files)),
-      updatedAt: new Date().toISOString()
-    };
-
-    setCurrentProject(updatedProj);
-    saveIdeProject(updatedProj);
-    runProject();
-    addToast('Reset Starter', 'Starter template files restored.', 'info');
+      files: JSON.parse(JSON.stringify(tmpl.files))
+    });
+    scheduleAutosave();
+    addToast('Project Reset', 'Reset files to initial template state.', 'info');
   };
 
   const exportProjectZip = async () => {
     if (!currentProject) return;
     await backupService.exportProjectAsZip(currentProject);
-    addToast('ZIP Exported', `Downloaded ${currentProject.name}.zip`, 'success');
+    addToast('Export Complete', `Downloaded ${currentProject.name}.zip`, 'success');
   };
 
   const exportProjectJson = () => {
     if (!currentProject) return;
     backupService.exportProjectAsJson(currentProject);
-    addToast('JSON Exported', `Downloaded ${currentProject.name}.stillskudy.json`, 'success');
+    addToast('Export Complete', `Downloaded ${currentProject.name}.json`, 'success');
   };
 
   const importProjectZip = async (file: File) => {
     try {
-      const newProj = await backupService.importProjectFromZip(file);
-      await saveIdeProject(newProj);
-      setCurrentProject(newProj);
-      setActiveFileName(newProj.activeFileName);
-      setOpenTabs(newProj.openTabs);
-      addToast('Project Imported', `Successfully imported "${newProj.name}" from ZIP!`, 'success');
+      const project = await backupService.importProjectFromZip(file);
+      await saveIdeProject(project);
+      setCurrentProject(project);
+      setActiveFileName(project.activeFileName || Object.keys(project.files)[0]);
+      setOpenTabs(project.openTabs || Object.keys(project.files));
+      addToast('Project Imported', `Imported "${project.name}".`, 'success');
     } catch (err: any) {
-      addToast('Import Failed', err.message || 'Could not parse ZIP archive.', 'warning');
+      addToast('Import Failed', err.message || 'Could not import ZIP', 'warning');
     }
   };
 
@@ -473,30 +557,29 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         activeFileName,
         openTabs,
         consoleLogs,
-        isRunning,
         previewUrl,
+        isRunning,
         isSaving,
         hasUnsavedChanges,
         activeChallengeId,
-        setActiveChallengeId,
-        loadProject,
-        createNewProjectFromTemplate,
-        createNewBlankProject,
         setActiveFileName,
         openFileInTab,
         closeTab,
         updateFileContent,
         createFile,
-        renameFile,
         deleteFile,
-        runProject,
-        stopProject,
-        clearConsole,
+        renameFile,
+        createNewBlankProject,
+        createFromTemplate,
+        loadProject,
         saveCurrentProject,
         resetToTemplate,
         exportProjectZip,
         exportProjectJson,
-        importProjectZip
+        importProjectZip,
+        runProject,
+        stopProject,
+        clearConsole
       }}
     >
       {children}

@@ -22,7 +22,7 @@ interface TemplatePickerProps {
 }
 
 export const TemplatePicker: React.FC<TemplatePickerProps> = ({ isOpen, onClose }) => {
-  const { createNewProjectFromTemplate } = useIDE();
+  const { createFromTemplate } = useIDE();
 
   const iconsMap: Record<string, React.ReactNode> = {
     Sparkles: <Sparkles className="w-5 h-5 text-amber-400" />,
@@ -37,7 +37,7 @@ export const TemplatePicker: React.FC<TemplatePickerProps> = ({ isOpen, onClose 
   };
 
   const handleSelectTemplate = async (templateId: string) => {
-    await createNewProjectFromTemplate(templateId);
+    await createFromTemplate(templateId);
     onClose();
   };
 
@@ -60,7 +60,18 @@ export const TemplatePicker: React.FC<TemplatePickerProps> = ({ isOpen, onClose 
                   <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
                     {iconsMap[template.icon] || <Sparkles className="w-5 h-5 text-brand-400" />}
                   </div>
-                  <Badge size="sm">{template.difficulty}</Badge>
+                  <Badge
+                    variant={
+                      template.difficulty === 'Beginner'
+                        ? 'success'
+                        : template.difficulty === 'Intermediate'
+                        ? 'warning'
+                        : 'danger'
+                    }
+                    size="sm"
+                  >
+                    {template.difficulty}
+                  </Badge>
                 </div>
 
                 <h4 className="text-sm font-bold text-slate-100 group-hover:text-brand-300 transition">
@@ -71,12 +82,9 @@ export const TemplatePicker: React.FC<TemplatePickerProps> = ({ isOpen, onClose 
                 </p>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                <span>{Object.keys(template.files).length} files</span>
-                <span className="text-brand-400 font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition">
-                  <span>Create Project</span>
-                  <ArrowRight className="w-3 h-3" />
-                </span>
+              <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs font-semibold text-brand-400">
+                <span>{Object.keys(template.files).length} files included</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
               </div>
             </div>
           ))}

@@ -7,8 +7,12 @@ import {
   CheckCircle2,
   Code2,
   FolderKanban,
-  CalendarCheck,
+  GitPullRequest,
+  Users,
+  School,
   Briefcase,
+  CalendarCheck,
+  Award,
   Trophy,
   Settings,
   Heart,
@@ -35,7 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { activeNav, setActiveNav } = useApp();
   const { isParent } = useAuth();
 
-  const navItems: { id: NavSection | 'parent'; label: string; icon: React.FC<{ className?: string }> }[] = [
+  const navItems: { id: NavSection; label: string; icon: React.FC<{ className?: string }> }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'academics', label: 'Academics', icon: GraduationCap },
     { id: 'skills', label: 'Skills', icon: Sparkles },
@@ -43,8 +47,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'practice', label: 'Practice', icon: CheckCircle2 },
     { id: 'ide', label: 'IDE / Code', icon: Code2 },
     { id: 'projects', label: 'Projects', icon: FolderKanban },
+    { id: 'foss', label: 'FOSS Hub', icon: GitPullRequest },
+    { id: 'mentors', label: 'Mentors', icon: Users },
+    { id: 'school', label: 'School LMS', icon: School },
+    { id: 'opportunities', label: 'Real-World', icon: Briefcase },
     { id: 'planner', label: 'Planner', icon: CalendarCheck },
-    { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
+    { id: 'portfolio', label: 'Portfolio', icon: Award },
     { id: 'achievements', label: 'Achievements', icon: Trophy },
     ...(isParent ? [{ id: 'parent' as const, label: 'Parent Portal', icon: Heart }] : []),
     { id: 'settings', label: 'Settings', icon: Settings }
@@ -66,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
         {/* Brand Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800 shrink-0">
           <div
             className="flex items-center gap-3 cursor-pointer overflow-hidden"
             onClick={() => setActiveNav('dashboard')}
@@ -80,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   StillSkudy
                 </span>
                 <span className="text-[10px] text-emerald-400 font-medium tracking-wide uppercase">
-                  Offline &amp; Cloud PWA
+                  Complete Platform
                 </span>
               </div>
             )}
@@ -96,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation List */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
           {navItems.map(item => {
             const Icon = item.icon;
             const isActive = activeNav === item.id;
@@ -105,10 +113,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 key={item.id}
                 onClick={() => {
-                  setActiveNav(item.id as NavSection);
+                  setActiveNav(item.id);
                   setMobileOpen(false);
                 }}
-                className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl font-medium text-sm transition group relative ${
+                className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl font-medium text-xs transition group relative ${
                   isActive
                     ? 'bg-brand-600/15 text-brand-400 font-semibold border border-brand-500/30'
                     : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent'
@@ -116,7 +124,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 title={collapsed ? item.label : undefined}
               >
                 <Icon
-                  className={`w-5 h-5 shrink-0 transition ${
+                  className={`w-4 h-4 shrink-0 transition ${
                     isActive ? 'text-brand-400' : 'text-slate-400 group-hover:text-slate-200'
                   }`}
                 />
@@ -130,13 +138,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </nav>
 
         {/* Local Storage / Cloud Indicator Footer */}
-        <div className="p-3 border-t border-slate-800 bg-slate-950/40">
+        <div className="p-3 border-t border-slate-800 bg-slate-950/40 shrink-0">
           <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-400 text-xs">
             <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
             {!collapsed && (
               <div className="truncate">
                 <p className="text-[11px] font-semibold text-slate-200">Local Device Active</p>
-                <p className="text-[10px] text-slate-500">IndexedDB Engine</p>
+                <p className="text-[10px] text-slate-500">All Phases Complete</p>
               </div>
             )}
           </div>

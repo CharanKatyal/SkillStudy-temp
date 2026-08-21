@@ -8,11 +8,9 @@ import {
   Sparkles,
   Code2,
   BookOpen,
-  HelpCircle,
   Minimize2,
   Maximize2,
-  Terminal,
-  Cpu
+  Clock
 } from 'lucide-react';
 import { useAI } from '../../context/AIContext';
 import { useIDE } from '../../context/IDEContext';
@@ -29,7 +27,7 @@ export const AIAssistantDrawer: React.FC = () => {
     aiConfig
   } = useAI();
 
-  const { currentProject, activeFileName } = useIDE();
+  const { activeFileName } = useIDE();
 
   const [inputPrompt, setInputPrompt] = useState('');
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -52,6 +50,9 @@ export const AIAssistantDrawer: React.FC = () => {
       >
         <Bot className="w-5 h-5 animate-pulse" />
         <span className="text-xs font-bold pr-1 hidden sm:inline">AI Tutor</span>
+        <span className="text-[10px] bg-amber-400/90 text-amber-950 px-1.5 py-0.2 rounded-full font-bold">
+          Preview
+        </span>
       </button>
     );
   }
@@ -75,7 +76,7 @@ export const AIAssistantDrawer: React.FC = () => {
           isExpanded ? 'w-[90vw] md:w-[680px] h-[85vh]' : 'w-[90vw] sm:w-[400px] h-[540px]'
         }`}
       >
-        {/* Drawer Header */}
+        {/* Drawer Header with Coming Soon notice */}
         <div className="px-4 py-3 bg-slate-850 border-b border-slate-800 flex items-center justify-between select-none">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white shadow">
@@ -84,11 +85,12 @@ export const AIAssistantDrawer: React.FC = () => {
             <div>
               <div className="flex items-center gap-1.5">
                 <h3 className="text-xs font-bold text-slate-100">StillSkudy AI Tutor</h3>
-                <span className="text-[9px] font-semibold text-emerald-400 bg-emerald-950 px-1.5 py-0.2 rounded border border-emerald-800/40 uppercase">
-                  {aiConfig.provider === 'offline-engine' ? 'Offline' : aiConfig.provider}
+                <span className="text-[9px] font-extrabold text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-700/60 uppercase animate-pulse flex items-center gap-1">
+                  <Clock className="w-2.5 h-2.5" />
+                  <span>Coming Soon..</span>
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400">Contextual Learning &amp; Code Assistant</p>
+              <p className="text-[10px] text-slate-400">Contextual Learning &amp; Code Assistant Preview</p>
             </div>
           </div>
 
@@ -122,6 +124,11 @@ export const AIAssistantDrawer: React.FC = () => {
               <X className="w-4 h-4" />
             </button>
           </div>
+        </div>
+
+        {/* Coming Soon Notice Banner */}
+        <div className="px-3 py-1.5 bg-amber-950/40 border-b border-amber-800/40 text-[11px] text-amber-300 flex items-center justify-between">
+          <span>Full conversational AI model is coming soon! Try the offline preview below.</span>
         </div>
 
         {/* Quick Action Chips */}

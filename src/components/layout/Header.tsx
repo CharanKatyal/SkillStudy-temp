@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Flame, Code2, Moon, Sun, User } from 'lucide-react';
+import { Menu, Flame, Code2, Moon, Sun } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useData } from '../../context/DataContext';
 import { SyncStatusIndicator } from '../sync/SyncStatusIndicator';
@@ -18,11 +18,16 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
     skills: { title: 'Practical Skills', subtitle: 'Modern web development, coding, tools, and UI/UX design' },
     learn: { title: 'Learning Paths', subtitle: 'Step-by-step master roadmaps' },
     practice: { title: 'Practice Hub', subtitle: 'Quizzes, true/false, short answers, and code challenges' },
-    ide: { title: 'Integrated Offline IDE', subtitle: 'Write HTML, CSS, JavaScript, and live-preview in browser' },
+    ide: { title: 'Multi-Language Offline IDE', subtitle: 'HTML, CSS, JS, Python, C++, Java browser sandbox' },
     projects: { title: 'Project Management', subtitle: 'Milestones, tasks, and portfolio links' },
+    foss: { title: 'Open Source (FOSS) Hub', subtitle: 'Contribute to beginner-friendly repositories & PRs' },
+    mentors: { title: 'Mentorship Network', subtitle: '1-on-1 office hours and expert code reviews' },
+    school: { title: 'School & Classroom LMS', subtitle: 'Assignments, due dates, and academic submissions' },
+    opportunities: { title: 'Real-World Client Projects & Grants', subtitle: 'Build production apps & earn educational stipends' },
     planner: { title: 'Study Planner', subtitle: 'Manual calendar and schedule tasks' },
     portfolio: { title: 'Student Showcase Portfolio', subtitle: 'Exportable resume of your projects and skills' },
     achievements: { title: 'Achievements & Milestones', subtitle: 'Unlock badges through real offline progress' },
+    parent: { title: 'Parent Portal', subtitle: 'Learning oversight, study hours, and academic reports' },
     settings: { title: 'Settings & Data Backup', subtitle: 'Theme, editor preferences, JSON backup and restore' }
   };
 
