@@ -1,9 +1,9 @@
 /**
- * Offline-First IndexedDB Engine for SkillForge
+ * Offline-First IndexedDB Engine for Skudium
  * Stores all student data locally on device with zero external dependencies.
  */
 
-const DB_NAME = 'SkillForge_DB';
+const DB_NAME = 'Skudium_DB';
 const DB_VERSION = 1;
 
 export const STORES = {

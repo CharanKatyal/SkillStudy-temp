@@ -17,12 +17,12 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello SkillForge</title>
+  <title>Hello Skudium</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="card">
-    <div class="badge">SkillForge Offline IDE</div>
+    <div class="badge">Skudium Offline IDE</div>
     <h1>Hello, Future Developer! 🚀</h1>
     <p>This is your offline playground. Edit HTML, CSS, and JS, then click <strong>Run</strong>.</p>
     <button id="magicBtn">Click for Inspiration</button>
@@ -1060,7 +1060,7 @@ loop();`
     <h1>Alex Rivers</h1>
     <p class="subtitle">Student & Aspiring Software Engineer</p>
     <div class="bio">
-      Passionate about web development, algorithms, and offline-first software. Currently learning full-stack development with SkillForge!
+      Passionate about web development, algorithms, and offline-first software. Currently learning full-stack development with Skudium!
     </div>
     
     <h3>Core Skills</h3>
@@ -1219,7 +1219,7 @@ nav a:hover { color: #38bdf8; }
       'script.js': {
         name: 'script.js',
         language: 'javascript',
-        content: `console.log('Portfolio initialized successfully in SkillForge offline sandbox.');`
+        content: `console.log('Portfolio initialized successfully in Skudium offline sandbox.');`
       }
     }
   }

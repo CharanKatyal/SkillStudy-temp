@@ -7,21 +7,15 @@ import {
   CheckCircle2,
   Code2,
   FolderKanban,
-  GitPullRequest,
-  Users,
-  School,
-  Briefcase,
   CalendarCheck,
   Award,
   Trophy,
   Settings,
-  Heart,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
 import { NavSection } from '../../types';
 import { useApp } from '../../context/AppContext';
-import { useAuth } from '../../context/AuthContext';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -37,7 +31,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setMobileOpen
 }) => {
   const { activeNav, setActiveNav } = useApp();
-  const { isParent } = useAuth();
 
   const navItems: { id: NavSection; label: string; icon: React.FC<{ className?: string }> }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -45,16 +38,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'skills', label: 'Skills', icon: Sparkles },
     { id: 'learn', label: 'Learn', icon: BookOpen },
     { id: 'practice', label: 'Practice', icon: CheckCircle2 },
-    { id: 'ide', label: 'IDE / Code', icon: Code2 },
+    { id: 'ide', label: 'IDE Studio', icon: Code2 },
     { id: 'projects', label: 'Projects', icon: FolderKanban },
-    { id: 'foss', label: 'FOSS Hub', icon: GitPullRequest },
-    { id: 'mentors', label: 'Mentors', icon: Users },
-    { id: 'school', label: 'School LMS', icon: School },
-    { id: 'opportunities', label: 'Real-World', icon: Briefcase },
     { id: 'planner', label: 'Planner', icon: CalendarCheck },
     { id: 'portfolio', label: 'Portfolio', icon: Award },
     { id: 'achievements', label: 'Achievements', icon: Trophy },
-    ...(isParent ? [{ id: 'parent' as const, label: 'Guardian Portal', icon: Heart }] : []),
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -63,32 +51,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Mobile Backdrop */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-sm lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 flex flex-col bg-slate-900 border-r border-slate-800 transition-all duration-300 ${
+        className={`fixed top-0 bottom-0 left-0 z-40 flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ${
           collapsed ? 'w-20' : 'w-64'
         } ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
-        {/* Brand Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800 shrink-0">
+        {/* Brand Header with Vector Icon */}
+        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
           <div
             className="flex items-center gap-3 cursor-pointer overflow-hidden"
             onClick={() => setActiveNav('dashboard')}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-brand-900/30 shrink-0 font-extrabold text-lg tracking-tight">
-              SF
+            {/* Custom Skudium Vector Icon */}
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-cyan-500 to-blue-600 p-0.5 shadow-md shrink-0 flex items-center justify-center">
+              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                <svg viewBox="0 0 24 24" className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                  <path d="M2 17l10 5 10-5" />
+                  <path d="M2 12l10 5 10-5" />
+                </svg>
+              </div>
             </div>
+
             {!collapsed && (
               <div className="flex flex-col">
-                <span className="font-bold text-base text-slate-100 tracking-tight leading-tight">
-                  SkillForge
+                <span className="font-extrabold text-lg text-slate-900 dark:text-slate-100 tracking-tight leading-tight">
+                  Skudium
                 </span>
-                <span className="text-[10px] text-emerald-400 font-medium tracking-wide uppercase">
-                  100% Offline Platform
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold tracking-wider uppercase">
+                  Learning Studio
                 </span>
               </div>
             )}
@@ -96,7 +92,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition"
+            className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -118,37 +114,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }}
                 className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl font-medium text-xs transition group relative ${
                   isActive
-                    ? 'bg-brand-600/15 text-brand-400 font-semibold border border-brand-500/30'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent'
+                    ? 'bg-brand-500/10 text-brand-600 dark:text-brand-400 font-bold border border-brand-500/30'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60 border border-transparent'
                 }`}
                 title={collapsed ? item.label : undefined}
               >
                 <Icon
                   className={`w-4 h-4 shrink-0 transition ${
-                    isActive ? 'text-brand-400' : 'text-slate-400 group-hover:text-slate-200'
+                    isActive
+                      ? 'text-brand-600 dark:text-brand-400'
+                      : 'text-slate-400 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200'
                   }`}
                 />
                 {!collapsed && <span className="truncate">{item.label}</span>}
                 {isActive && (
-                  <span className="absolute right-2.5 w-1.5 h-1.5 rounded-full bg-brand-400 shadow-sm shadow-brand-400/50" />
+                  <span className="absolute right-2.5 w-1.5 h-1.5 rounded-full bg-brand-500 shadow-sm shadow-brand-500/50" />
                 )}
               </button>
             );
           })}
         </nav>
-
-        {/* Local Storage Status Footer */}
-        <div className="p-3 border-t border-slate-800 bg-slate-950/40 shrink-0">
-          <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-400 text-xs">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-            {!collapsed && (
-              <div className="truncate">
-                <p className="text-[11px] font-semibold text-slate-200">Local Device Active</p>
-                <p className="text-[10px] text-slate-500">Zero Cloud • 100% Offline</p>
-              </div>
-            )}
-          </div>
-        </div>
       </aside>
     </>
   );

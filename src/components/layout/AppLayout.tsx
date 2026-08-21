@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
-import { OfflineBanner } from './OfflineBanner';
 import { ToastContainer } from '../common/Toast';
 import { AIAssistantDrawer } from '../ai/AIAssistantDrawer';
 import { useApp } from '../../context/AppContext';
@@ -16,9 +15,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { toasts, removeToast } = useApp();
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
-      <OfflineBanner />
-
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       <div className="flex flex-1 relative">
         <Sidebar
           collapsed={collapsed}
@@ -40,7 +37,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </div>
       </div>
 
-      {/* Phase 3 AI Tutor Floating Assistant */}
+      {/* AI Assistant Floating Button */}
       <AIAssistantDrawer />
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />

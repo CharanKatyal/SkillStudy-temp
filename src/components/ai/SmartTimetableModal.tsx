@@ -41,7 +41,7 @@ export const SmartTimetableModal: React.FC<SmartTimetableModalProps> = ({ isOpen
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="AI Smart Timetable Generator" maxWidth="2xl">
+    <Modal isOpen={isOpen} onClose={onClose} title="Smart Timetable Generator" maxWidth="2xl">
       <div className="space-y-4">
         {/* Banner */}
         <div className="p-4 rounded-xl bg-gradient-to-r from-brand-950/70 to-slate-900 border border-brand-800/40 text-xs text-slate-300 flex items-center gap-3">

@@ -13,14 +13,9 @@ import { LearnView } from './components/learn/LearnView';
 import { PracticeView } from './components/practice/PracticeView';
 import { IDEView } from './components/ide/IDEView';
 import { ProjectsView } from './components/projects/ProjectsView';
-import { FossHubView } from './components/foss/FossHubView';
-import { MentorsView } from './components/mentors/MentorsView';
-import { SchoolClassroomView } from './components/schools/SchoolClassroomView';
-import { RealWorldProjectsView } from './components/realworld/RealWorldProjectsView';
 import { PlannerView } from './components/planner/PlannerView';
 import { PortfolioView } from './components/portfolio/PortfolioView';
 import { AchievementsView } from './components/achievements/AchievementsView';
-import { ParentPortalView } from './components/sync/ParentPortalView';
 import { SettingsView } from './components/settings/SettingsView';
 
 const MainViewRouter: React.FC = () => {
@@ -31,8 +26,8 @@ const MainViewRouter: React.FC = () => {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center space-y-3">
         <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs text-slate-400 font-semibold tracking-wide">
-          Loading SkillForge Local Storage...
+        <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold tracking-wide">
+          Loading Skudium Studio...
         </p>
       </div>
     );
@@ -53,22 +48,12 @@ const MainViewRouter: React.FC = () => {
       return <IDEView />;
     case 'projects':
       return <ProjectsView />;
-    case 'foss':
-      return <FossHubView />;
-    case 'mentors':
-      return <MentorsView />;
-    case 'school':
-      return <SchoolClassroomView />;
-    case 'opportunities':
-      return <RealWorldProjectsView />;
     case 'planner':
       return <PlannerView />;
     case 'portfolio':
       return <PortfolioView />;
     case 'achievements':
       return <AchievementsView />;
-    case 'parent':
-      return <ParentPortalView />;
     case 'settings':
       return <SettingsView />;
     default:

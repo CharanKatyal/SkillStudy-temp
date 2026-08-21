@@ -6,14 +6,9 @@ export type NavSection =
   | 'practice'
   | 'ide'
   | 'projects'
-  | 'foss'
-  | 'mentors'
-  | 'school'
-  | 'opportunities'
   | 'planner'
   | 'portfolio'
   | 'achievements'
-  | 'parent'
   | 'settings';
 
 export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced';
@@ -294,95 +289,4 @@ export interface UserProgressState {
     projectsCompleted: number;
     codingTimeMinutes: number;
   };
-}
-
-// -------------------------------------------------------------
-// Phase 4: FOSS & Advanced Coding Types
-// -------------------------------------------------------------
-export interface FossProject {
-  id: string;
-  title: string;
-  organization: string;
-  description: string;
-  tags: string[];
-  stars: number;
-  goodFirstIssues: {
-    id: string;
-    title: string;
-    difficulty: Difficulty;
-    description: string;
-    completed: boolean;
-  }[];
-}
-
-// -------------------------------------------------------------
-// Phase 5: Mentors, Schools, Real-World Projects & Opportunities
-// -------------------------------------------------------------
-export interface MentorProfile {
-  id: string;
-  name: string;
-  roleTitle: string;
-  organization: string;
-  rating: number;
-  sessionsCompleted: number;
-  expertise: string[];
-  avatar: string;
-  bio: string;
-  availability: string;
-}
-
-export interface ClassroomAssignment {
-  id: string;
-  title: string;
-  subject: string;
-  dueDate: string;
-  points: number;
-  submitted: boolean;
-  grade?: string;
-  instructions: string;
-}
-
-export interface Classroom {
-  id: string;
-  code: string;
-  name: string;
-  teacherName: string;
-  subject: string;
-  announcements: string[];
-  assignments: ClassroomAssignment[];
-}
-
-export interface RealWorldProjectBrief {
-  id: string;
-  title: string;
-  clientName: string;
-  clientCategory: 'Non-Profit' | 'Community' | 'Education' | 'Local Business';
-  description: string;
-  budgetStipend: number;
-  deadline: string;
-  deliverables: string[];
-  status: 'available' | 'in_progress' | 'completed';
-}
-
-export interface StudentOpportunity {
-  id: string;
-  title: string;
-  organization: string;
-  type: 'micro_bounty' | 'apprenticeship' | 'grant';
-  stipendAmount: number;
-  skills: string[];
-  description: string;
-  status: 'open' | 'applied' | 'awarded';
-}
-
-export interface StudentWallet {
-  balanceUSD: number;
-  transactions: {
-    id: string;
-    title: string;
-    amount: number;
-    type: 'credit' | 'debit';
-    date: string;
-    category: 'Grant' | 'Bounty' | 'Project Stipend';
-  }[];
 }

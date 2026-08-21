@@ -64,7 +64,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
   {
     id: 'first_project',
     title: 'Architect in the Making',
-    description: 'Create your first project in SkillForge.',
+    description: 'Create your first project in Skudium.',
     icon: 'FolderKanban',
     category: 'projects',
     unlocked: false,

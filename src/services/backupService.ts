@@ -33,7 +33,7 @@ export class BackupService {
     return {
       version: '1.0.0',
       exportedAt: new Date().toISOString(),
-      app: 'SkillForge',
+      app: 'Skudium',
       profile,
       settings,
       progress,
@@ -53,7 +53,7 @@ export class BackupService {
     const backupData = await this.generateFullBackup();
     const jsonStr = JSON.stringify(backupData, null, 2);
     const dateStr = new Date().toISOString().split('T')[0];
-    const fileName = `SkillForge_Backup_${dateStr}.json`;
+    const fileName = `Skudium_Backup_${dateStr}.json`;
 
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -71,10 +71,10 @@ export class BackupService {
    */
   async restoreFromBackupJson(jsonString: string): Promise<{ success: boolean; message: string }> {
     try {
-      const data: StillSkudyBackup = JSON.parse(jsonString);
+      const data: any = JSON.parse(jsonString);
 
-      if ((data.app !== 'SkillForge' && data.app !== 'StillSkudy') || !data.profile || !data.progress) {
-        throw new Error('Invalid SkillForge backup format');
+      if ((data.app !== 'Skudium' && data.app !== 'SkillForge' && data.app !== 'StillSkudy') || !data.profile || !data.progress) {
+        throw new Error('Invalid Skudium backup format');
       }
 
       await storageService.resetAllData();
@@ -133,11 +133,11 @@ export class BackupService {
       zip.file(filename, fileObj.content);
     });
 
-    // Add SkillForge project manifest
+    // Add Skudium project manifest
     const manifest = {
       name: project.name,
       description: project.description,
-      exportedFrom: 'SkillForge Offline IDE',
+      exportedFrom: 'Skudium Offline IDE',
       createdAt: project.createdAt,
       exportedAt: new Date().toISOString()
     };

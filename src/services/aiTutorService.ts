@@ -6,7 +6,7 @@ export class AITutorService {
   };
 
   constructor() {
-    const raw = localStorage.getItem('skillforge_ai_config');
+    const raw = localStorage.getItem('skudium_ai_config');
     if (raw) {
       try {
         this.config = JSON.parse(raw);
@@ -20,7 +20,7 @@ export class AITutorService {
 
   saveConfig(newConfig: AIProviderConfig) {
     this.config = newConfig;
-    localStorage.setItem('skillforge_ai_config', JSON.stringify(newConfig));
+    localStorage.setItem('skudium_ai_config', JSON.stringify(newConfig));
   }
 
   /**
@@ -64,7 +64,7 @@ export class AITutorService {
     } else if (lower.includes('math') || lower.includes('formula') || lower.includes('equation')) {
       content = `### 📐 Core Mathematical Concepts\n\n* **Linear Equations**: $y = mx + b$ where $m$ is slope and $b$ is $y$-intercept.\n* **Quadratic Formula**: $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$\n* **Newton's 2nd Law**: $\\vec{F} = m\\vec{a}$\n\nAll formulas and problem sets are available in full detail inside the **Academics** section!`;
     } else {
-      content = `### 🎓 SkillForge Learning Guide (100% Offline)\n\nI'm your offline educational companion! SkillForge runs completely inside your browser with **zero internet connection** needed.\n\nHere is how you can level up right now:\n* 📖 **Academics**: Study structured Math, Science, and English lessons.\n* 💻 **Skills**: Learn HTML, CSS, JavaScript, and Python with hands-on challenges.\n* 🛠️ **Offline IDE**: Code and preview web apps with instant console logs.\n* 📝 **Practice Hub**: Test your retention with interactive quizzes.\n\n*(Full on-device conversational AI model is coming soon!)*`;
+      content = `### 🎓 Skudium Learning Guide (100% Offline)\n\nI'm your offline educational companion! Skudium runs completely inside your browser with **zero internet connection** needed.\n\nHere is how you can level up right now:\n* 📖 **Academics**: Study structured Math, Science, and English lessons.\n* 💻 **Skills**: Learn HTML, CSS, JavaScript, and Python with hands-on challenges.\n* 🛠️ **Offline IDE**: Code and preview web apps with instant console logs.\n* 📝 **Practice Hub**: Test your retention with interactive quizzes.\n\n*(Full on-device conversational AI model is coming soon!)*`;
     }
 
     return {

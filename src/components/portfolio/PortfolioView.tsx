@@ -208,7 +208,7 @@ export const PortfolioView: React.FC = () => {
 
       {/* Printable Footer */}
       <div className="text-center pt-8 border-t border-slate-800 text-xs text-slate-500">
-        <p>Verified Student Transcript &amp; Portfolio • SkillForge Offline-First Education System</p>
+        <p>Verified Student Transcript &amp; Portfolio • Skudium Offline-First Education System</p>
       </div>
 
       <PortfolioCustomizer

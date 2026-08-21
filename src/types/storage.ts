@@ -10,10 +10,10 @@ import {
   PracticeAttempt
 } from './index';
 
-export interface SkillForgeBackup {
+export interface SkudiumBackup {
   version: string | number;
   exportedAt: string;
-  app: 'SkillForge' | 'StillSkudy';
+  app: 'Skudium' | 'SkillForge' | 'StillSkudy';
   profile: UserProfile;
   settings: UserSettings;
   progress: UserProgressState;
@@ -25,7 +25,8 @@ export interface SkillForgeBackup {
   practiceAttempts: PracticeAttempt[];
 }
 
-export type StillSkudyBackup = SkillForgeBackup;
+export type StillSkudyBackup = SkudiumBackup;
+export type SkillForgeBackup = SkudiumBackup;
 
 export type StoreName =
   | 'profile'

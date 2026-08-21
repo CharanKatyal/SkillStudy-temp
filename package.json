@@ -1,13 +1,12 @@
 {
-  "name": "skillforge",
+  "name": "skudium",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
-    "test": "vitest run"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@codemirror/lang-css": "^6.2.1",
@@ -35,10 +34,6 @@
     "tailwindcss": "^3.4.17",
     "typescript": "~5.7.2",
     "vite": "^6.1.0",
-    "vite-plugin-pwa": "^0.21.1",
-    "vitest": "^3.0.0",
-    "jsdom": "^25.0.0",
-    "@testing-library/react": "^16.0.0",
-    "@testing-library/jest-dom": "^6.5.0"
+    "vite-plugin-pwa": "^0.21.1"
   }
 }

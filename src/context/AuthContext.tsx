@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { AuthUser, ParentStudentLink, SyncStatus } from '../types/auth';
 import { useApp } from './AppContext';
 
@@ -27,10 +27,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { addToast } = useApp();
   const [user, setUser] = useState<AuthUser | null>(() => {
-    const raw = localStorage.getItem('skillforge_user_profile');
+    const raw = localStorage.getItem('skudium_user_profile');
     return raw ? JSON.parse(raw) : {
       id: 'local-student-1',
-      email: 'student@skillforge.local',
+      email: 'student@skudium.local',
       displayName: 'Alex Scholar',
       role: 'student',
       gradeLevel: '10th Grade'
@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       parentId: 'local-parent-1',
       studentId: 'local-student-1',
       studentName: 'Alex Scholar',
-      studentEmail: 'student@skillforge.local',
+      studentEmail: 'student@skudium.local',
       status: 'active',
       createdAt: new Date().toISOString()
     }
@@ -66,7 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     setUser(authUser);
-    localStorage.setItem('skillforge_user_profile', JSON.stringify(authUser));
+    localStorage.setItem('skudium_user_profile', JSON.stringify(authUser));
     addToast(`Welcome, ${authUser.displayName}!`, `Switched to offline ${authUser.role} mode.`, 'success');
     return { success: true, message: 'Logged in locally' };
   };
@@ -87,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     setUser(authUser);
-    localStorage.setItem('skillforge_user_profile', JSON.stringify(authUser));
+    localStorage.setItem('skudium_user_profile', JSON.stringify(authUser));
     addToast(`Profile Created`, `Active offline profile: ${authUser.displayName} (${role})`, 'success');
     return { success: true, message: 'Profile created locally' };
   };
@@ -95,18 +95,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     const defaultStudent: AuthUser = {
       id: 'local-student-1',
-      email: 'student@skillforge.local',
+      email: 'student@skudium.local',
       displayName: 'Alex Scholar',
       role: 'student',
       gradeLevel: '10th Grade'
     };
     setUser(defaultStudent);
-    localStorage.setItem('skillforge_user_profile', JSON.stringify(defaultStudent));
+    localStorage.setItem('skudium_user_profile', JSON.stringify(defaultStudent));
     addToast('Reset to Default Student', 'Your local offline progress is safely stored in IndexedDB.', 'info');
   };
 
   const generateStudentLinkCode = async (): Promise<string> => {
-    const code = `FORGE-${Math.floor(1000 + Math.random() * 9000)}`;
+    const code = `SKUD-${Math.floor(1000 + Math.random() * 9000)}`;
     return code;
   };
 
@@ -116,7 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       parentId: user?.id || 'parent-1',
       studentId: 'local-student-1',
       studentName: 'Alex Scholar',
-      studentEmail: 'student@skillforge.local',
+      studentEmail: 'student@skudium.local',
       status: 'active',
       createdAt: new Date().toISOString()
     };

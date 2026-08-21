@@ -57,7 +57,7 @@ const DEFAULT_PROGRESS: UserProgressState = {
 
 const DEFAULT_PORTFOLIO: PortfolioData = {
   customTitle: 'Student Developer & Thinker',
-  bio: 'Building responsive offline web applications and exploring computer science fundamentals with SkillForge.',
+  bio: 'Building responsive offline web applications and exploring computer science fundamentals with Skudium.',
   skills: [
     { name: 'HTML5 Semantic Markup', level: 'Intermediate' },
     { name: 'Modern CSS & Flexbox', level: 'Intermediate' },

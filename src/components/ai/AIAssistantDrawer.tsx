@@ -20,7 +20,7 @@ export const AIAssistantDrawer: React.FC = () => {
       <button
         onClick={() => setIsDrawerOpen(true)}
         className="fixed bottom-6 right-6 z-40 p-3.5 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 text-white shadow-2xl shadow-brand-900/50 hover:scale-105 active:scale-95 transition flex items-center gap-2 group border border-emerald-400/30"
-        title="SkillForge AI Co-Pilot (Coming Soon...)"
+        title="Skudium AI Co-Pilot (Coming Soon...)"
       >
         <Bot className="w-5 h-5" />
         <span className="text-xs font-bold pr-1 hidden sm:inline">AI Co-Pilot</span>
@@ -41,7 +41,7 @@ export const AIAssistantDrawer: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-xs font-bold text-slate-100">SkillForge AI Co-Pilot</h3>
+              <h3 className="text-xs font-bold text-slate-100">Skudium AI Co-Pilot</h3>
               <span className="text-[9px] font-extrabold text-amber-300 bg-amber-950/90 px-2 py-0.5 rounded-full border border-amber-700/60 uppercase flex items-center gap-1">
                 <Clock className="w-2.5 h-2.5" />
                 <span>Coming Soon</span>
@@ -69,7 +69,7 @@ export const AIAssistantDrawer: React.FC = () => {
           On-Device AI Assistant is in Active Development
         </h4>
         <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-          SkillForge is engineered to run <strong>100% offline</strong> with zero cloud dependencies. An on-device WebLLM model is being tailored to provide private, local Socratic tutoring directly inside your browser.
+          Skudium is engineered to run <strong>100% offline</strong> with zero cloud dependencies. An on-device WebLLM model is being tailored to provide private, local Socratic tutoring directly inside your browser.
         </p>
       </div>
 

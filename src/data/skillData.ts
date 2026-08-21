@@ -48,7 +48,7 @@ HTML (HyperText Markup Language) defines the structure and meaning of web conten
     </article>
   </main>
   <footer>
-    <p>&copy; 2026 SkillForge</p>
+    <p>&copy; 2026 Skudium</p>
   </footer>
 </body>
 </html>
@@ -173,7 +173,7 @@ Use \`<table>\`, \`<thead>\`, \`<tbody>\`, \`<tr>\`, \`<th>\`, and \`<td>\` for 
     </ul>
   </main>
   <footer>
-    <p>Powered by SkillForge Offline</p>
+    <p>Powered by Skudium Offline</p>
   </footer>
 </body>
 </html>`
@@ -567,7 +567,7 @@ button.addEventListener('click', () => {
         content: `### Python Foundations & Clean Syntax
 
 > [!NOTE]
-> In SkillForge, Python lessons provide syntax-highlighted code analysis and logic exercises with full in-browser execution support.
+> In Skudium, Python lessons provide syntax-highlighted code analysis and logic exercises with full in-browser execution support.
 
 \`\`\`python
 # Student record system in Python

@@ -16,8 +16,8 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`bg-slate-850/80 border border-slate-800/80 rounded-2xl p-5 ${
-        hoverable ? 'hover:border-slate-700 hover:bg-slate-800/90 transition cursor-pointer' : ''
+      className={`bg-white dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm dark:shadow-none transition-colors duration-200 ${
+        hoverable ? 'hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md cursor-pointer' : ''
       } ${className}`}
     >
       {children}

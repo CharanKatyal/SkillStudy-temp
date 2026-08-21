@@ -113,13 +113,13 @@ export const PlannerView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Phase 3 AI Smart Timetable Generator */}
+          {/* Smart Timetable Generator */}
           <button
             onClick={() => setIsAiTimetableModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-purple-950/60 border border-purple-700/60 hover:bg-purple-900/60 text-purple-200 text-xs font-bold flex items-center gap-1.5 transition shadow"
+            className="px-3.5 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-700/60 hover:bg-purple-100 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-200 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
           >
-            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-            <span>AI Smart Timetable</span>
+            <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+            <span>Smart Timetable</span>
           </button>
 
           <button

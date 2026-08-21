@@ -12,7 +12,7 @@ export const AITutorSettingsModal: React.FC<AITutorSettingsModalProps> = ({ isOp
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="SkillForge AI Architecture"
+      title="Skudium AI Architecture"
       maxWidth="md"
     >
       <div className="space-y-4 text-xs">
@@ -21,7 +21,7 @@ export const AITutorSettingsModal: React.FC<AITutorSettingsModalProps> = ({ isOp
           <div>
             <h4 className="font-bold text-amber-200">AI Co-Pilot Status: In Development</h4>
             <p className="text-amber-400/90 text-[11px] mt-0.5 leading-relaxed">
-              SkillForge operates strictly without external APIs, tracking, or cloud infrastructure.
+              Skudium operates strictly without external APIs, tracking, or cloud infrastructure.
             </p>
           </div>
         </div>
@@ -32,7 +32,7 @@ export const AITutorSettingsModal: React.FC<AITutorSettingsModalProps> = ({ isOp
             <span>Planned Engine: On-Device WebLLM &amp; WebGPU</span>
           </div>
           <p className="text-slate-400 text-[11px] leading-relaxed">
-            When released in an upcoming offline update, SkillForge will embed an optimized open-weights quantized model (e.g. Qwen / Phi) running 100% inside your browser sandbox via WebAssembly.
+            When released in an upcoming offline update, Skudium will embed an optimized open-weights quantized model (e.g. Qwen / Phi) running 100% inside your browser sandbox via WebAssembly.
           </p>
         </div>
 

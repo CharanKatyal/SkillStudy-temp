@@ -360,7 +360,7 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (lang === 'html') defaultContent = '<!DOCTYPE html>\n<html>\n<head>\n  <title>New Page</title>\n</head>\n<body>\n  <h1>Hello World</h1>\n</body>\n</html>';
     if (lang === 'css') defaultContent = '/* Stylesheet */\nbody {\n  margin: 0;\n  padding: 1rem;\n}';
     if (lang === 'javascript') defaultContent = '// JavaScript\nconsole.log("Ready!");';
-    if (lang === 'python') defaultContent = '# Python Script\nprint("Hello from SkillForge Python Sandbox!")\n\nfor i in range(1, 4):\n    print(f"Step {i}: Complete")';
+    if (lang === 'python') defaultContent = '# Python Script\nprint("Hello from Skudium Python Sandbox!")\n\nfor i in range(1, 4):\n    print(f"Step {i}: Complete")';
     if (lang === 'cpp') defaultContent = '#include <iostream>\n\nint main() {\n    std::cout << "Hello from C++ Sandbox!" << std::endl;\n    return 0;\n}';
     if (lang === 'java') defaultContent = 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from Java Sandbox!");\n    }\n}';
 
@@ -454,7 +454,7 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         'index.html': {
           name: 'index.html',
           language: 'html',
-          content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Document</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <h1>Welcome to SkillForge</h1>\n  <p>Start coding offline!</p>\n  <script src="script.js"></script>\n</body>\n</html>'
+          content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Document</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <h1>Welcome to Skudium</h1>\n  <p>Start coding offline!</p>\n  <script src="script.js"></script>\n</body>\n</html>'
         },
         'style.css': {
           name: 'style.css',
@@ -464,7 +464,7 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         'script.js': {
           name: 'script.js',
           language: 'javascript',
-          content: 'console.log("SkillForge sandbox ready!");'
+          content: 'console.log("Skudium sandbox ready!");'
         }
       },
       activeFileName: 'index.html',

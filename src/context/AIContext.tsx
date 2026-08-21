@@ -36,7 +36,7 @@ export const AIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     {
       id: 'welcome-msg',
       role: 'assistant',
-      content: `👋 **Hi there! I'm the SkillForge AI Co-Pilot (Coming Soon).**\n\nFull on-device offline AI tutoring is currently in development. You can explore all 100% offline curriculum lessons, coding sandboxes, quizzes, and projects right now!`,
+      content: `👋 **Hi there! I'm the Skudium AI Co-Pilot (Coming Soon).**\n\nFull on-device offline AI tutoring is currently in development. You can explore all 100% offline curriculum lessons, coding sandboxes, quizzes, and projects right now!`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);

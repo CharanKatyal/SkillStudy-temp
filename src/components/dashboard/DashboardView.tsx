@@ -55,35 +55,35 @@ export const DashboardView: React.FC = () => {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-950/90 via-slate-850 to-slate-900 border border-brand-800/40 p-6 sm:p-8 shadow-xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-900/40 via-brand-950/20 to-slate-900 border border-brand-500/20 p-6 sm:p-8 shadow-md">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-900/60 border border-brand-700/50 text-brand-300 text-xs font-semibold">
-              <span className="w-2 h-2 rounded-full bg-brand-400 animate-pulse" />
-              <span>Offline &amp; Cloud Ready • Phase 3 AI Enabled</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-semibold">
+              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+              <span>Interactive Learning Platform</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
               Welcome back, {profile?.displayName || 'Scholar'}! 👋
             </h2>
-            <p className="text-slate-300 text-sm max-w-xl leading-relaxed">
-              Continue your self-paced journey across academics, programming, and real-world projects. All your data is safely persisted locally with optional AI co-pilot assistance.
+            <p className="text-slate-600 dark:text-slate-300 text-sm max-w-xl leading-relaxed">
+              Continue your self-paced learning journey across academic subjects, modern coding skills, and hands-on portfolio projects.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => setActiveNav('ide')}
-              className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm flex items-center gap-2 shadow-lg shadow-brand-900/40 transition transform active:scale-95"
+              className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm flex items-center gap-2 shadow-md transition transform active:scale-95"
             >
               <Code2 className="w-4 h-4" />
-              <span>Open IDE</span>
+              <span>Open Studio</span>
             </button>
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-brand-300 border border-brand-800/40 font-semibold text-sm flex items-center gap-2 transition"
+              className="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-800 dark:text-brand-300 border border-slate-200 dark:border-brand-800/40 font-semibold text-sm flex items-center gap-2 transition"
             >
-              <Bot className="w-4 h-4 text-brand-400" />
-              <span>Ask AI Tutor</span>
+              <Bot className="w-4 h-4 text-brand-600 dark:text-brand-400" />
+              <span>AI Assistant</span>
             </button>
           </div>
         </div>
@@ -100,7 +100,7 @@ export const DashboardView: React.FC = () => {
             <GraduationCap className="w-4 h-4 text-sky-400" />
           </div>
           <div className="mt-3">
-            <span className="text-2xl font-bold text-slate-100">{completedLessonsCount}</span>
+            <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{completedLessonsCount}</span>
             <span className="text-xs text-slate-500 ml-1">/ {totalLessons}</span>
           </div>
         </Card>
@@ -111,7 +111,7 @@ export const DashboardView: React.FC = () => {
             <Code2 className="w-4 h-4 text-amber-400" />
           </div>
           <div className="mt-3">
-            <span className="text-2xl font-bold text-slate-100">{completedChallengesCount}</span>
+            <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{completedChallengesCount}</span>
             <span className="text-xs text-emerald-400 ml-1 font-medium">solved</span>
           </div>
         </Card>
@@ -122,7 +122,7 @@ export const DashboardView: React.FC = () => {
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="mt-3">
-            <span className="text-2xl font-bold text-slate-100">
+            <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">
               {progress?.stats?.practiceQuizzesTaken || 0}
             </span>
             <span className="text-xs text-slate-500 ml-1">taken</span>
@@ -135,7 +135,7 @@ export const DashboardView: React.FC = () => {
             <Target className="w-4 h-4 text-purple-400" />
           </div>
           <div className="mt-3">
-            <span className="text-2xl font-bold text-slate-100">
+            <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">
               {progress?.stats?.practiceAccuracy || 100}%
             </span>
             <span className="text-xs text-slate-500 ml-1">avg</span>
@@ -148,7 +148,7 @@ export const DashboardView: React.FC = () => {
             <Flame className="w-4 h-4 text-orange-400" />
           </div>
           <div className="mt-3">
-            <span className="text-2xl font-bold text-slate-100">
+            <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">
               {progress?.streak?.current || 1}
             </span>
             <span className="text-xs text-orange-400 ml-1 font-medium">days</span>
@@ -161,7 +161,7 @@ export const DashboardView: React.FC = () => {
             <Trophy className="w-4 h-4 text-yellow-400" />
           </div>
           <div className="mt-3">
-            <span className="text-2xl font-bold text-slate-100">{unlockedAchievementsCount}</span>
+            <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{unlockedAchievementsCount}</span>
             <span className="text-xs text-slate-500 ml-1">/ {achievements.length}</span>
           </div>
         </Card>
