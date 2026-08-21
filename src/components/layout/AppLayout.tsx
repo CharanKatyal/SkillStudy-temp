@@ -3,6 +3,7 @@ import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { OfflineBanner } from './OfflineBanner';
 import { ToastContainer } from '../common/Toast';
+import { AIAssistantDrawer } from '../ai/AIAssistantDrawer';
 import { useApp } from '../../context/AppContext';
 
 interface AppLayoutProps {
@@ -38,6 +39,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           </main>
         </div>
       </div>
+
+      {/* Phase 3 AI Tutor Floating Assistant */}
+      <AIAssistantDrawer />
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
     </div>

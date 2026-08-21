@@ -1,8 +1,9 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import { DataProvider, useData } from './context/DataContext';
 import { IDEProvider } from './context/IDEContext';
+import { AIProvider } from './context/AIContext';
 import { AppLayout } from './components/layout/AppLayout';
 
 import { DashboardView } from './components/dashboard/DashboardView';
@@ -69,9 +70,11 @@ export function App() {
       <AuthProvider>
         <DataProvider>
           <IDEProvider>
-            <AppLayout>
-              <MainViewRouter />
-            </AppLayout>
+            <AIProvider>
+              <AppLayout>
+                <MainViewRouter />
+              </AppLayout>
+            </AIProvider>
           </IDEProvider>
         </DataProvider>
       </AuthProvider>

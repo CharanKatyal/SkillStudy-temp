@@ -12,18 +12,21 @@ import {
   Play,
   FolderKanban,
   Target,
-  ExternalLink
+  Bot
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useData } from '../../context/DataContext';
+import { useAI } from '../../context/AIContext';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { ProgressBar } from '../common/ProgressBar';
+import { AdaptiveRecommendationsCard } from '../ai/AdaptiveRecommendationsCard';
 import { ACADEMIC_SUBJECTS } from '../../data/academicData';
 import { SKILL_SUBJECTS } from '../../data/skillData';
 
 export const DashboardView: React.FC = () => {
   const { setActiveNav, setSelectedSubjectId, setSelectedSkillId } = useApp();
+  const { setIsDrawerOpen } = useAI();
   const {
     profile,
     progress,
@@ -57,13 +60,13 @@ export const DashboardView: React.FC = () => {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-900/60 border border-brand-700/50 text-brand-300 text-xs font-semibold">
               <span className="w-2 h-2 rounded-full bg-brand-400 animate-pulse" />
-              <span>Offline Ready — Zero Server Required</span>
+              <span>Offline &amp; Cloud Ready • Phase 3 AI Enabled</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">
               Welcome back, {profile?.displayName || 'Scholar'}! 👋
             </h2>
             <p className="text-slate-300 text-sm max-w-xl leading-relaxed">
-              Continue your self-paced journey across academics, programming, and real-world projects. All your data is safely persisted in local storage.
+              Continue your self-paced journey across academics, programming, and real-world projects. All your data is safely persisted locally with optional AI co-pilot assistance.
             </p>
           </div>
 
@@ -76,15 +79,18 @@ export const DashboardView: React.FC = () => {
               <span>Open IDE</span>
             </button>
             <button
-              onClick={() => setActiveNav('learn')}
-              className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 font-semibold text-sm flex items-center gap-2 transition"
+              onClick={() => setIsDrawerOpen(true)}
+              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-brand-300 border border-brand-800/40 font-semibold text-sm flex items-center gap-2 transition"
             >
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Continue Learning</span>
+              <Bot className="w-4 h-4 text-brand-400" />
+              <span>Ask AI Tutor</span>
             </button>
           </div>
         </div>
       </div>
+
+      {/* Phase 3 Adaptive Learning & Recommendations */}
+      <AdaptiveRecommendationsCard />
 
       {/* Core Stats Overview */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
@@ -183,7 +189,7 @@ export const DashboardView: React.FC = () => {
 
             {todayTasks.length === 0 ? (
               <div className="text-center py-6 text-slate-400 text-sm">
-                <p>No tasks scheduled for today. Add study tasks in your planner!</p>
+                <p>No tasks scheduled for today. Add study tasks in your planner or generate an AI timetable!</p>
               </div>
             ) : (
               <div className="space-y-2.5">
@@ -279,53 +285,6 @@ export const DashboardView: React.FC = () => {
               })}
             </div>
           </Card>
-
-          {/* Practical Skills Progress */}
-          <Card>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-400" />
-                <h3 className="text-base font-bold text-slate-100">Practical Skills</h3>
-              </div>
-              <button
-                onClick={() => setActiveNav('skills')}
-                className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1"
-              >
-                <span>Explore Skills</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {SKILL_SUBJECTS.slice(0, 4).map(skill => {
-                const completedInSkill = skill.lessons.filter(
-                  l => progress?.completedLessons?.[l.id]
-                ).length;
-                const pct = Math.round((completedInSkill / (skill.lessons.length || 1)) * 100);
-
-                return (
-                  <div
-                    key={skill.id}
-                    onClick={() => {
-                      setSelectedSkillId(skill.id);
-                      setActiveNav('skills');
-                    }}
-                    className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 cursor-pointer transition flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-bold text-slate-200">{skill.name}</span>
-                        <Badge size="sm">{skill.difficulty}</Badge>
-                      </div>
-                    </div>
-                    <div className="mt-3">
-                      <ProgressBar value={pct} color="bg-brand-500" height="sm" />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
         </div>
 
         {/* Right 1 Column: IDE Projects & Achievements */}
@@ -394,47 +353,6 @@ export const DashboardView: React.FC = () => {
                   </div>
                   <div className="mt-3">
                     <ProgressBar value={p.progress} height="sm" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Recent Achievements */}
-          <Card>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-amber-400" />
-                <h3 className="text-base font-bold text-slate-100">Achievements</h3>
-              </div>
-              <button
-                onClick={() => setActiveNav('achievements')}
-                className="text-xs font-semibold text-amber-400 hover:text-amber-300"
-              >
-                All Badges
-              </button>
-            </div>
-
-            <div className="space-y-2">
-              {achievements.slice(0, 3).map(ach => (
-                <div
-                  key={ach.id}
-                  className={`p-3 rounded-xl border flex items-center gap-3 ${
-                    ach.unlocked
-                      ? 'bg-amber-950/20 border-amber-800/40 text-amber-200'
-                      : 'bg-slate-900 border-slate-800 text-slate-400'
-                  }`}
-                >
-                  <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      ach.unlocked ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-800 text-slate-500'
-                    }`}
-                  >
-                    <Trophy className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h5 className="text-xs font-bold text-slate-200 truncate">{ach.title}</h5>
-                    <p className="text-[11px] text-slate-400 truncate">{ach.description}</p>
                   </div>
                 </div>
               ))}

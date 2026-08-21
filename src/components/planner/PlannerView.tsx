@@ -8,12 +8,13 @@ import {
   Edit2,
   ChevronLeft,
   ChevronRight,
-  Info,
+  Sparkles,
   Calendar as CalendarIcon
 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { PlannerTask } from '../../types';
 import { TaskModal } from './TaskModal';
+import { SmartTimetableModal } from '../ai/SmartTimetableModal';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 
@@ -25,13 +26,14 @@ export const PlannerView: React.FC = () => {
   );
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isAiTimetableModalOpen, setIsAiTimetableModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<PlannerTask | null>(null);
 
   // Calculate current week days
   const getDaysOfWeek = (dateStr: string) => {
     const current = new Date(dateStr);
     const day = current.getDay(); // 0 is Sunday
-    const diff = current.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+    const diff = current.getDate() - day + (day === 0 ? -6 : 1);
     const monday = new Date(current.setDate(diff));
 
     const week = [];
@@ -70,19 +72,6 @@ export const PlannerView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fadeIn">
-      {/* AI Roadmap Future Disclaimer Banner */}
-      <div className="p-4 rounded-xl bg-sky-950/40 border border-sky-800/50 flex items-center justify-between gap-4 text-xs text-sky-200">
-        <div className="flex items-center gap-2.5">
-          <Info className="w-4 h-4 text-sky-400 shrink-0" />
-          <span>
-            <strong>Manual Study Planner (Phase 1):</strong> Schedule and organize your learning sessions locally.
-          </span>
-        </div>
-        <span className="text-[11px] text-sky-400/80 hidden sm:inline">
-          AI-powered personalized planning will be added in a future version.
-        </span>
-      </div>
-
       {/* Header & View Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -123,13 +112,24 @@ export const PlannerView: React.FC = () => {
           </div>
         </div>
 
-        <button
-          onClick={handleOpenAdd}
-          className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Task</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Phase 3 AI Smart Timetable Generator */}
+          <button
+            onClick={() => setIsAiTimetableModalOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-purple-950/60 border border-purple-700/60 hover:bg-purple-900/60 text-purple-200 text-xs font-bold flex items-center gap-1.5 transition shadow"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            <span>AI Smart Timetable</span>
+          </button>
+
+          <button
+            onClick={handleOpenAdd}
+            className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Task</span>
+          </button>
+        </div>
       </div>
 
       {/* Week Day Pills (if week view) */}
@@ -183,7 +183,7 @@ export const PlannerView: React.FC = () => {
         {filteredTasks.length === 0 ? (
           <div className="text-center py-12 text-slate-500 text-xs">
             <CalendarIcon className="w-8 h-8 mx-auto mb-2 text-slate-600" />
-            <p>No study tasks scheduled for this period. Click "Add Task" to plan your day.</p>
+            <p>No study tasks scheduled for this period. Click "Add Task" or generate an AI Smart Timetable.</p>
           </div>
         ) : (
           <div className="space-y-2.5">
@@ -261,6 +261,11 @@ export const PlannerView: React.FC = () => {
         onClose={() => setIsTaskModalOpen(false)}
         taskToEdit={taskToEdit}
         defaultDate={selectedDate}
+      />
+
+      <SmartTimetableModal
+        isOpen={isAiTimetableModalOpen}
+        onClose={() => setIsAiTimetableModalOpen(false)}
       />
     </div>
   );
