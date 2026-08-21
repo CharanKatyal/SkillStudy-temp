@@ -23,21 +23,8 @@ export interface ParentStudentLink {
 }
 
 export interface SyncStatus {
-  isOnline: boolean;
+  status?: string;
   isSyncing: boolean;
   lastSyncedAt: string | null;
   pendingChangesCount: number;
-  syncError: string | null;
-}
-
-export interface DeltaSyncPayload {
-  lastSyncedTimestamp: string;
-  profile?: any;
-  settings?: any;
-  progress?: any;
-  ideProjects?: any[];
-  managedProjects?: any[];
-  plannerTasks?: any[];
-  portfolio?: any;
-  practiceAttempts?: any[];
 }

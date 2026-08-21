@@ -98,7 +98,7 @@ export const LivePreview: React.FC = () => {
           >
             <iframe
               src={previewUrl}
-              title="StillSkudy Sandboxed Preview"
+              title="SkillForge Sandboxed Preview"
               sandbox="allow-scripts"
               className="w-full h-full border-0 bg-white"
             />

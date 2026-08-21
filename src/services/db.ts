@@ -1,9 +1,9 @@
 /**
- * Offline-First IndexedDB Engine for StillSkudy
+ * Offline-First IndexedDB Engine for SkillForge
  * Stores all student data locally on device with zero external dependencies.
  */
 
-const DB_NAME = 'StillSkudy_DB';
+const DB_NAME = 'SkillForge_DB';
 const DB_VERSION = 1;
 
 export const STORES = {

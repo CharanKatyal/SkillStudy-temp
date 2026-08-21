@@ -32,7 +32,7 @@ const MainViewRouter: React.FC = () => {
       <div className="h-[60vh] flex flex-col items-center justify-center space-y-3">
         <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-xs text-slate-400 font-semibold tracking-wide">
-          Loading StillSkudy Storage...
+          Loading SkillForge Local Storage...
         </p>
       </div>
     );

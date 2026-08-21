@@ -84,7 +84,7 @@ export const INITIAL_STUDENT_WALLET: StudentWallet = {
     },
     {
       id: 'tx-2',
-      title: 'StillSkudy Student Educational Grant',
+      title: 'SkillForge Student Educational Grant',
       amount: 150,
       type: 'credit',
       date: '2026-08-10',

@@ -27,11 +27,11 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
     planner: { title: 'Study Planner', subtitle: 'Manual calendar and schedule tasks' },
     portfolio: { title: 'Student Showcase Portfolio', subtitle: 'Exportable resume of your projects and skills' },
     achievements: { title: 'Achievements & Milestones', subtitle: 'Unlock badges through real offline progress' },
-    parent: { title: 'Parent Portal', subtitle: 'Learning oversight, study hours, and academic reports' },
+    parent: { title: 'Guardian & Parent Review', subtitle: 'Learning oversight, study hours, and academic reports' },
     settings: { title: 'Settings & Data Backup', subtitle: 'Theme, editor preferences, JSON backup and restore' }
   };
 
-  const currentInfo = titles[activeNav] || { title: 'StillSkudy', subtitle: 'Offline Learning Platform' };
+  const currentInfo = titles[activeNav] || { title: 'SkillForge', subtitle: '100% Offline Learning Platform' };
 
   const toggleTheme = () => {
     if (!settings) return;
@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Phase 2: Cloud Sync Status & Auth */}
+        {/* Offline Status & Profile Indicator */}
         <SyncStatusIndicator />
 
         {/* Streak Counter */}
@@ -99,7 +99,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           <div className="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold">
             {profile?.displayName ? profile.displayName[0].toUpperCase() : 'S'}
           </div>
-          <span className="text-xs font-medium text-slate-200 max-w-[90px] truncate hidden sm:inline">
+          <span className="text-xs font-semibold text-slate-200 hidden xl:inline max-w-[120px] truncate">
             {profile?.displayName || 'Student'}
           </span>
         </div>

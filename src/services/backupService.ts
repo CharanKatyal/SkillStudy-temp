@@ -33,7 +33,7 @@ export class BackupService {
     return {
       version: '1.0.0',
       exportedAt: new Date().toISOString(),
-      app: 'StillSkudy',
+      app: 'SkillForge',
       profile,
       settings,
       progress,
@@ -53,7 +53,7 @@ export class BackupService {
     const backupData = await this.generateFullBackup();
     const jsonStr = JSON.stringify(backupData, null, 2);
     const dateStr = new Date().toISOString().split('T')[0];
-    const fileName = `StillSkudy_Backup_${dateStr}.json`;
+    const fileName = `SkillForge_Backup_${dateStr}.json`;
 
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -73,8 +73,8 @@ export class BackupService {
     try {
       const data: StillSkudyBackup = JSON.parse(jsonString);
 
-      if (data.app !== 'StillSkudy' || !data.profile || !data.progress) {
-        throw new Error('Invalid StillSkudy backup format');
+      if ((data.app !== 'SkillForge' && data.app !== 'StillSkudy') || !data.profile || !data.progress) {
+        throw new Error('Invalid SkillForge backup format');
       }
 
       await storageService.resetAllData();
@@ -133,11 +133,11 @@ export class BackupService {
       zip.file(filename, fileObj.content);
     });
 
-    // Add StillSkudy project manifest
+    // Add SkillForge project manifest
     const manifest = {
       name: project.name,
       description: project.description,
-      exportedFrom: 'StillSkudy Offline IDE',
+      exportedFrom: 'SkillForge Offline IDE',
       createdAt: project.createdAt,
       exportedAt: new Date().toISOString()
     };

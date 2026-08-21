@@ -9,10 +9,10 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     navigator.serviceWorker
       .register('/sw.js')
       .then(reg => {
-        console.log('[StillSkudy PWA] Service Worker registered:', reg.scope);
+        console.log('[SkillForge PWA] Service Worker registered:', reg.scope);
       })
       .catch(err => {
-        console.log('[StillSkudy PWA] Service Worker registration failed:', err);
+        console.log('[SkillForge PWA] Service Worker registration failed:', err);
       });
   });
 }

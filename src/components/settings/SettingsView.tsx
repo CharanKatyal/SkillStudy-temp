@@ -10,11 +10,9 @@ import {
   RotateCcw,
   ShieldCheck,
   Heart,
-  Cloud,
   Copy,
   Check,
-  LogOut,
-  Sparkles
+  HardDrive
 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { useApp } from '../../context/AppContext';
@@ -25,12 +23,12 @@ import { Modal } from '../common/Modal';
 
 export const SettingsView: React.FC = () => {
   const { profile, settings, updateProfile, updateSettings, resetAllData } = useData();
-  const { user, isAuthenticated, isParent, logout, generateStudentLinkCode, triggerManualSync } = useAuth();
+  const { user, isParent, generateStudentLinkCode } = useAuth();
   const { addToast } = useApp();
 
-  const [displayName, setDisplayName] = useState(profile?.displayName || '');
-  const [bio, setBio] = useState(profile?.bio || '');
-  const [gradeLevel, setGradeLevel] = useState(profile?.gradeLevel || 'High School');
+  const [displayName, setDisplayName] = useState(profile?.displayName || 'Alex Scholar');
+  const [bio, setBio] = useState(profile?.bio || 'Building responsive offline web applications with SkillForge.');
+  const [gradeLevel, setGradeLevel] = useState(profile?.gradeLevel || '10th Grade');
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [linkCode, setLinkCode] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
@@ -46,6 +44,7 @@ export const SettingsView: React.FC = () => {
       bio: bio.trim(),
       gradeLevel: gradeLevel.trim()
     });
+    addToast('Profile Saved', 'Offline student profile updated successfully.', 'success');
   };
 
   const handleThemeChange = (theme: 'dark' | 'light' | 'system') => {
@@ -82,7 +81,7 @@ export const SettingsView: React.FC = () => {
   const handleExportBackup = async () => {
     try {
       await backupService.exportFullBackupToFile();
-      addToast('Backup Exported', 'Downloaded complete StillSkudy backup JSON.', 'success');
+      addToast('Backup Exported', 'Downloaded complete SkillForge backup JSON file.', 'success');
     } catch (err: any) {
       addToast('Export Failed', err.message, 'warning');
     }
@@ -99,7 +98,7 @@ export const SettingsView: React.FC = () => {
       const text = await file.text();
       const res = await backupService.restoreFromBackupJson(text);
       if (res.success) {
-        addToast('Backup Restored', 'All student data successfully imported!', 'success');
+        addToast('Backup Restored', 'All student data successfully imported into IndexedDB!', 'success');
         window.location.reload();
       } else {
         addToast('Restore Failed', res.message, 'warning');
@@ -122,83 +121,58 @@ export const SettingsView: React.FC = () => {
       <div>
         <h2 className="text-2xl font-bold text-slate-100">Settings &amp; Data Management</h2>
         <p className="text-xs text-slate-400 mt-1">
-          Manage your student profile, visual preferences, editor configurations, parent links, and data backups.
+          Manage your offline student profile, code editor preferences, guardian links, and local IndexedDB backups.
         </p>
       </div>
 
-      {/* Phase 2: Cloud Sync & Parent Linkage Card */}
-      <Card className="p-6 border-purple-850/60 bg-gradient-to-r from-slate-850 to-purple-950/20">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+      {/* 100% Offline Storage Architecture Banner */}
+      <Card className="p-6 border-emerald-800/40 bg-gradient-to-r from-slate-850 to-emerald-950/20">
+        <div className="flex items-center justify-between mb-3 pb-3 border-b border-slate-800">
           <div className="flex items-center gap-2">
-            <Cloud className="w-5 h-5 text-purple-400" />
-            <h3 className="text-base font-bold text-slate-100">Phase 2: Cloud &amp; Parent Integration</h3>
+            <HardDrive className="w-5 h-5 text-emerald-400" />
+            <h3 className="text-base font-bold text-slate-100">100% Offline Data Sovereignty</h3>
           </div>
-          {isAuthenticated && (
-            <button
-              onClick={logout}
-              className="text-xs text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Log Out</span>
-            </button>
-          )}
+          <span className="text-[11px] font-semibold text-emerald-300 bg-emerald-950 border border-emerald-800 px-2.5 py-0.5 rounded-full">
+            Zero Cloud Dependency
+          </span>
         </div>
 
-        {isAuthenticated ? (
-          <div className="space-y-4 text-xs">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-900 border border-slate-800">
-              <div>
-                <span className="font-bold text-slate-200">Logged in as: {user?.email}</span>
-                <p className="text-slate-400 text-[11px] mt-0.5 capitalize">Account Role: {user?.role}</p>
+        <p className="text-xs text-slate-300 leading-relaxed">
+          SkillForge stores your entire curriculum progress, notes, sandboxed code projects, study schedules, and quiz attempts inside your browser's local <strong>IndexedDB database</strong>. Your data never leaves your hardware.
+        </p>
+
+        {!isParent && (
+          <div className="mt-4 p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-200 font-bold text-xs">
+                <Heart className="w-4 h-4 text-purple-400" />
+                <span>Guardian / Parent Review Code</span>
               </div>
               <button
-                onClick={triggerManualSync}
-                className="px-3.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold transition self-start sm:self-auto"
+                onClick={handleGenerateLink}
+                className="px-3 py-1 bg-slate-800 hover:bg-slate-750 text-purple-300 rounded-lg text-xs font-semibold"
               >
-                Sync Now
+                {linkCode ? 'Refresh Code' : 'Generate Code'}
               </button>
             </div>
+            <p className="text-slate-400 text-[11px]">
+              Generate a local pairing code to switch to Guardian Review mode for academic progress tracking.
+            </p>
 
-            {!isParent && (
-              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-slate-200 font-bold">
-                    <Heart className="w-4 h-4 text-purple-400" />
-                    <span>Parent / Guardian Link Code</span>
-                  </div>
-                  <button
-                    onClick={handleGenerateLink}
-                    className="px-3 py-1 bg-slate-800 hover:bg-slate-750 text-purple-300 rounded-lg font-semibold"
-                  >
-                    {linkCode ? 'Refresh Code' : 'Generate Invite Code'}
-                  </button>
-                </div>
-                <p className="text-slate-400 text-[11px]">
-                  Share this invite code with your parent so they can monitor your learning milestones from the Parent Portal.
-                </p>
-
-                {linkCode && (
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-950 border border-purple-850">
-                    <span className="font-mono text-sm font-bold text-purple-300 tracking-wider">
-                      {linkCode}
-                    </span>
-                    <button
-                      onClick={handleCopyCode}
-                      className="ml-auto text-slate-400 hover:text-slate-200 p-1 flex items-center gap-1"
-                    >
-                      {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{copiedCode ? 'Copied' : 'Copy'}</span>
-                    </button>
-                  </div>
-                )}
+            {linkCode && (
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-slate-950 border border-purple-850">
+                <span className="font-mono text-sm font-bold text-purple-300 tracking-wider">
+                  {linkCode}
+                </span>
+                <button
+                  onClick={handleCopyCode}
+                  className="ml-auto text-slate-400 hover:text-slate-200 p-1 flex items-center gap-1 text-xs"
+                >
+                  {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedCode ? 'Copied' : 'Copy'}</span>
+                </button>
               </div>
             )}
-          </div>
-        ) : (
-          <div className="text-xs text-slate-300 space-y-2">
-            <p>
-              You are currently using <strong>100% Local Offline Mode</strong>. Sign in to back up your progress to the cloud or connect a parent account.
-            </p>
           </div>
         )}
       </Card>
@@ -249,63 +223,77 @@ export const SettingsView: React.FC = () => {
               type="submit"
               className="px-5 py-2 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl shadow-md transition"
             >
-              Save Profile
+              Save Profile Changes
             </button>
           </div>
         </form>
       </Card>
 
-      {/* Theme Settings */}
+      {/* Theme & Visual Preferences */}
       <Card className="p-6 border-slate-800">
-        <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-800">
-          <Moon className="w-5 h-5 text-sky-400" />
-          <h3 className="text-base font-bold text-slate-100">Appearance &amp; Theme</h3>
-        </div>
+        <h3 className="text-base font-bold text-slate-100 mb-4 pb-3 border-b border-slate-800">
+          Visual Theme
+        </h3>
 
         <div className="grid grid-cols-3 gap-3">
-          {[
-            { id: 'dark', label: 'Dark Mode', icon: Moon },
-            { id: 'light', label: 'Light Mode', icon: Sun },
-            { id: 'system', label: 'System Default', icon: Laptop }
-          ].map(t => {
-            const Icon = t.icon;
-            const isSelected = settings?.theme === t.id;
+          <button
+            type="button"
+            onClick={() => handleThemeChange('dark')}
+            className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition ${
+              settings?.theme === 'dark'
+                ? 'bg-slate-900 border-brand-500 text-brand-400 ring-1 ring-brand-500'
+                : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+            }`}
+          >
+            <Moon className="w-5 h-5" />
+            <span className="text-xs font-semibold">Dark Theme</span>
+          </button>
 
-            return (
-              <button
-                key={t.id}
-                onClick={() => handleThemeChange(t.id as any)}
-                className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition ${
-                  isSelected
-                    ? 'bg-brand-950/40 border-brand-500 text-brand-300 font-bold'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-850'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="text-xs">{t.label}</span>
-              </button>
-            );
-          })}
+          <button
+            type="button"
+            onClick={() => handleThemeChange('light')}
+            className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition ${
+              settings?.theme === 'light'
+                ? 'bg-slate-900 border-brand-500 text-brand-400 ring-1 ring-brand-500'
+                : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+            }`}
+          >
+            <Sun className="w-5 h-5" />
+            <span className="text-xs font-semibold">Light Theme</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleThemeChange('system')}
+            className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition ${
+              settings?.theme === 'system'
+                ? 'bg-slate-900 border-brand-500 text-brand-400 ring-1 ring-brand-500'
+                : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+            }`}
+          >
+            <Laptop className="w-5 h-5" />
+            <span className="text-xs font-semibold">System Default</span>
+          </button>
         </div>
       </Card>
 
-      {/* Code Editor Configuration */}
+      {/* Editor Preferences */}
       <Card className="p-6 border-slate-800">
         <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-800">
-          <Code2 className="w-5 h-5 text-amber-400" />
-          <h3 className="text-base font-bold text-slate-100">Editor Preferences</h3>
+          <Code2 className="w-5 h-5 text-brand-400" />
+          <h3 className="text-base font-bold text-slate-100">Code Editor Preferences</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div>
-            <label className="block font-semibold text-slate-300 mb-1">
-              Font Size ({settings?.editor?.fontSize || 14}px)
+            <label className="block text-slate-300 font-semibold mb-1">
+              Editor Font Size: {settings?.editor?.fontSize || 14}px
             </label>
             <input
               type="range"
-              min="12"
-              max="22"
-              step="1"
+              min={12}
+              max={22}
+              step={1}
               value={settings?.editor?.fontSize || 14}
               onChange={e => handleEditorChange('fontSize', Number(e.target.value))}
               className="w-full accent-brand-500"
@@ -313,7 +301,7 @@ export const SettingsView: React.FC = () => {
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-300 mb-1">Tab Size</label>
+            <label className="block text-slate-300 font-semibold mb-1">Tab Size</label>
             <select
               value={settings?.editor?.tabSize || 2}
               onChange={e => handleEditorChange('tabSize', Number(e.target.value))}
@@ -324,35 +312,29 @@ export const SettingsView: React.FC = () => {
             </select>
           </div>
 
-          <div className="flex items-center gap-2 pt-2">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <span className="text-slate-300 font-semibold">Show Line Numbers</span>
             <input
               type="checkbox"
-              id="lineNumbers"
               checked={settings?.editor?.lineNumbers ?? true}
               onChange={e => handleEditorChange('lineNumbers', e.target.checked)}
-              className="rounded text-brand-600 focus:ring-0 bg-slate-900 border-slate-700"
+              className="w-4 h-4 accent-brand-500 rounded cursor-pointer"
             />
-            <label htmlFor="lineNumbers" className="text-slate-300 cursor-pointer">
-              Show Line Numbers
-            </label>
           </div>
 
-          <div className="flex items-center gap-2 pt-2">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <span className="text-slate-300 font-semibold">Word Wrap</span>
             <input
               type="checkbox"
-              id="wordWrap"
               checked={settings?.editor?.wordWrap ?? true}
               onChange={e => handleEditorChange('wordWrap', e.target.checked)}
-              className="rounded text-brand-600 focus:ring-0 bg-slate-900 border-slate-700"
+              className="w-4 h-4 accent-brand-500 rounded cursor-pointer"
             />
-            <label htmlFor="wordWrap" className="text-slate-300 cursor-pointer">
-              Word Wrap
-            </label>
           </div>
         </div>
       </Card>
 
-      {/* Data Backup & Restore */}
+      {/* Offline Data Backup & Restore */}
       <Card className="p-6 border-slate-800">
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
           <div className="flex items-center gap-2">
@@ -362,7 +344,7 @@ export const SettingsView: React.FC = () => {
         </div>
 
         <p className="text-xs text-slate-400 leading-relaxed mb-6">
-          StillSkudy stores your entire progress, notes, coding files, and study tasks locally in your browser's IndexedDB. Export a JSON backup to move your workspace across computers.
+          SkillForge stores your entire progress, notes, coding files, and study tasks locally in your browser's IndexedDB. Export a JSON backup to move your workspace across computers.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

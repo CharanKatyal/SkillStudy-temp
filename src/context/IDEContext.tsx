@@ -88,14 +88,15 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const handleOpenIdeEvent = async (e: any) => {
       if (e.detail) {
-        const { title, files, challengeId } = e.detail;
+        const { title, starterFiles, challengeId } = e.detail;
+        const files = starterFiles || {};
         const newProj: IdeProject = {
           id: `proj-${Date.now()}`,
           name: title || 'Lesson Starter Code',
           description: `Created for ${title}`,
-          files: files || {},
-          activeFileName: Object.keys(files || {})[0] || 'index.html',
-          openTabs: Object.keys(files || {}),
+          files,
+          activeFileName: Object.keys(files)[0] || 'index.html',
+          openTabs: Object.keys(files),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
@@ -359,8 +360,8 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (lang === 'html') defaultContent = '<!DOCTYPE html>\n<html>\n<head>\n  <title>New Page</title>\n</head>\n<body>\n  <h1>Hello World</h1>\n</body>\n</html>';
     if (lang === 'css') defaultContent = '/* Stylesheet */\nbody {\n  margin: 0;\n  padding: 1rem;\n}';
     if (lang === 'javascript') defaultContent = '// JavaScript\nconsole.log("Ready!");';
-    if (lang === 'python') defaultContent = '# Python Script\nprint("Hello from StillSkudy Python Runner!")\n\nfor i in range(1, 4):\n    print(f"Step {i}: Complete")';
-    if (lang === 'cpp') defaultContent = '#include <iostream>\n\nint main() {\n    std::cout << "Hello from C++ WebAssembly Sandbox!" << std::endl;\n    return 0;\n}';
+    if (lang === 'python') defaultContent = '# Python Script\nprint("Hello from SkillForge Python Sandbox!")\n\nfor i in range(1, 4):\n    print(f"Step {i}: Complete")';
+    if (lang === 'cpp') defaultContent = '#include <iostream>\n\nint main() {\n    std::cout << "Hello from C++ Sandbox!" << std::endl;\n    return 0;\n}';
     if (lang === 'java') defaultContent = 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from Java Sandbox!");\n    }\n}';
 
     const newFiles = {
@@ -453,7 +454,7 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         'index.html': {
           name: 'index.html',
           language: 'html',
-          content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Document</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <h1>Welcome to StillSkudy</h1>\n  <p>Start coding!</p>\n  <script src="script.js"></script>\n</body>\n</html>'
+          content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Document</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <h1>Welcome to SkillForge</h1>\n  <p>Start coding offline!</p>\n  <script src="script.js"></script>\n</body>\n</html>'
         },
         'style.css': {
           name: 'style.css',
@@ -463,7 +464,7 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         'script.js': {
           name: 'script.js',
           language: 'javascript',
-          content: 'console.log("StillSkudy sandbox ready!");'
+          content: 'console.log("SkillForge sandbox ready!");'
         }
       },
       activeFileName: 'index.html',

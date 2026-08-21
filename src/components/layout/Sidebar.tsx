@@ -54,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'planner', label: 'Planner', icon: CalendarCheck },
     { id: 'portfolio', label: 'Portfolio', icon: Award },
     { id: 'achievements', label: 'Achievements', icon: Trophy },
-    ...(isParent ? [{ id: 'parent' as const, label: 'Parent Portal', icon: Heart }] : []),
+    ...(isParent ? [{ id: 'parent' as const, label: 'Guardian Portal', icon: Heart }] : []),
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -79,16 +79,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="flex items-center gap-3 cursor-pointer overflow-hidden"
             onClick={() => setActiveNav('dashboard')}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-brand-900/30 shrink-0">
-              <span className="font-extrabold text-lg tracking-tight">SS</span>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-brand-900/30 shrink-0 font-extrabold text-lg tracking-tight">
+              SF
             </div>
             {!collapsed && (
               <div className="flex flex-col">
                 <span className="font-bold text-base text-slate-100 tracking-tight leading-tight">
-                  StillSkudy
+                  SkillForge
                 </span>
                 <span className="text-[10px] text-emerald-400 font-medium tracking-wide uppercase">
-                  Complete Platform
+                  100% Offline Platform
                 </span>
               </div>
             )}
@@ -137,14 +137,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </nav>
 
-        {/* Local Storage / Cloud Indicator Footer */}
+        {/* Local Storage Status Footer */}
         <div className="p-3 border-t border-slate-800 bg-slate-950/40 shrink-0">
           <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-400 text-xs">
             <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
             {!collapsed && (
               <div className="truncate">
                 <p className="text-[11px] font-semibold text-slate-200">Local Device Active</p>
-                <p className="text-[10px] text-slate-500">All Phases Complete</p>
+                <p className="text-[10px] text-slate-500">Zero Cloud • 100% Offline</p>
               </div>
             )}
           </div>

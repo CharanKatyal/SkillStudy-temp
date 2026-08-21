@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'robots.txt'],
       manifest: {
-        name: 'StillSkudy — Offline Learning & Coding Platform',
-        short_name: 'StillSkudy',
-        description: 'Offline-first academic, skill, and coding platform for students.',
+        name: 'SkillForge — Offline Learning & Code Platform',
+        short_name: 'SkillForge',
+        description: '100% Offline-first academic, skill, and coding platform for students.',
         theme_color: '#16a34a',
         background_color: '#0f172a',
         display: 'standalone',
@@ -43,7 +43,7 @@ export default defineConfig({
               request.destination === 'font',
             handler: 'CacheFirst',
             options: {
-              cacheName: 'stillskudy-static-assets',
+              cacheName: 'skillforge-static-assets',
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 365
