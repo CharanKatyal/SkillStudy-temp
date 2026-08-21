@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+  }
+
+  body {
+    @apply bg-slate-900 text-slate-100 min-h-screen antialiased;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0b1120;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+}
+
+/* Print Stylesheet for Student Portfolio */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print, nav, aside, header, .offline-banner, button {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .portfolio-print-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    color: #111827 !important;
+    background: white !important;
+  }
+  .portfolio-print-container * {
+    color: #111827 !important;
+    border-color: #e5e7eb !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
