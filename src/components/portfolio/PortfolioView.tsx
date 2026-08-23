@@ -14,6 +14,7 @@ import { useApp } from '../../context/AppContext';
 import { PortfolioCustomizer } from './PortfolioCustomizer';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
+import { getAvatarDisplay } from '../../data/defaultAvatars';
 
 export const PortfolioView: React.FC = () => {
   const { profile, portfolio, managedProjects, achievements } = useData();
@@ -60,8 +61,25 @@ export const PortfolioView: React.FC = () => {
       <div className="p-8 rounded-3xl bg-gradient-to-r from-brand-50/60 via-white to-white dark:from-slate-850 dark:via-slate-850 dark:to-slate-900 border border-slate-200 dark:border-slate-750 shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white text-2xl font-extrabold shadow-md shrink-0">
-              {profile?.displayName ? profile.displayName[0].toUpperCase() : 'S'}
+            <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-md flex items-center justify-center border-2 border-brand-500/80 bg-slate-800 shrink-0">
+              {(() => {
+                const av = getAvatarDisplay(profile?.avatarUrl, profile?.displayName);
+                if (av.type === 'custom' && av.imageUrl) {
+                  return <img src={av.imageUrl} alt="Avatar" className="w-full h-full object-cover" />;
+                }
+                if (av.type === 'predefined') {
+                  return (
+                    <div className={`w-full h-full bg-gradient-to-tr ${av.bgGradient} flex items-center justify-center text-3xl select-none`}>
+                      {av.emojiOrIcon}
+                    </div>
+                  );
+                }
+                return (
+                  <div className="w-full h-full bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white text-2xl font-extrabold">
+                    {av.initial}
+                  </div>
+                );
+              })()}
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">

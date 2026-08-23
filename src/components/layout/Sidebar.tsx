@@ -12,7 +12,8 @@ import {
   Trophy,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Power
 } from 'lucide-react';
 import { NavSection } from '../../types';
 import { useApp } from '../../context/AppContext';
@@ -134,6 +135,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
             );
           })}
         </nav>
+
+        {/* Bottom Sidebar Power Action */}
+        <div className="p-3 border-t border-slate-200 dark:border-slate-800 shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                window.open('', '_self', '');
+                window.close();
+              } catch {}
+            }}
+            className={`w-full flex items-center ${
+              collapsed ? 'justify-center' : 'justify-start'
+            } gap-3 px-3 py-2.5 rounded-xl font-bold text-xs text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50/60 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-850 transition`}
+            title="Power Off / Exit"
+          >
+            <Power className="w-4 h-4 shrink-0" />
+            {!collapsed && <span>Power Off</span>}
+          </button>
+        </div>
       </aside>
     </>
   );

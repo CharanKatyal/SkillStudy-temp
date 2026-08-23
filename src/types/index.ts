@@ -19,6 +19,7 @@ export interface UserProfile {
   bio?: string;
   gradeLevel: string;
   avatarIcon?: string;
+  avatarUrl?: string;
   joinedAt: string;
 }
 

@@ -6,12 +6,14 @@ import {
   ArrowLeft,
   ArrowRight,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  Power
 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { useApp } from '../../context/AppContext';
 import { backupService } from '../../services/backupService';
 import { UserProfile } from '../../types';
+import { AvatarSelector } from '../common/AvatarSelector';
 
 export const OnboardingView: React.FC = () => {
   const { updateProfile, refreshData } = useData();
@@ -20,6 +22,7 @@ export const OnboardingView: React.FC = () => {
   const [mode, setMode] = useState<'welcome' | 'create'>('welcome');
   const [displayName, setDisplayName] = useState('');
   const [gradeLevel, setGradeLevel] = useState('10th Grade');
+  const [avatarUrl, setAvatarUrl] = useState('avatar-scholar');
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
 
@@ -39,6 +42,13 @@ export const OnboardingView: React.FC = () => {
     '11th Grade',
     '12th Grade'
   ];
+
+  const handlePowerOff = () => {
+    try {
+      window.open('', '_self', '');
+      window.close();
+    } catch {}
+  };
 
   const handleImportClick = () => {
     setImportError(null);
@@ -81,6 +91,7 @@ export const OnboardingView: React.FC = () => {
       gradeLevel: gradeLevel.trim(),
       bio: '',
       avatarIcon: 'GraduationCap',
+      avatarUrl: avatarUrl,
       joinedAt: new Date().toISOString()
     };
 
@@ -89,8 +100,21 @@ export const OnboardingView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 transition-colors">
-      <div className="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl dark:shadow-2xl animate-fadeIn">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex items-center justify-center p-4 transition-colors relative">
+      {/* Top Right Power Off Button */}
+      <div className="absolute top-4 right-4 z-20">
+        <button
+          type="button"
+          onClick={handlePowerOff}
+          className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-rose-500 hover:text-white hover:bg-rose-600 border border-slate-200 dark:border-slate-800 shadow-md transition flex items-center gap-1.5 text-xs font-bold"
+          title="Close / Exit Website"
+        >
+          <Power className="w-4 h-4" />
+          <span className="hidden sm:inline">Close</span>
+        </button>
+      </div>
+
+      <div className="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl dark:shadow-2xl animate-fadeIn my-8">
         {/* Brand Header */}
         <div className="flex items-center gap-3 justify-center mb-6">
           <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 via-cyan-500 to-blue-600 p-0.5 shadow-md flex items-center justify-center shrink-0">
@@ -142,7 +166,7 @@ export const OnboardingView: React.FC = () => {
                   </div>
                   <div className="text-left">
                     <div>Create New User</div>
-                    <div className="text-[11px] text-brand-100 font-normal">Start fresh workspace with name & grade</div>
+                    <div className="text-[11px] text-brand-100 font-normal">Choose avatar, name &amp; grade</div>
                   </div>
                 </div>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition shrink-0" />
@@ -194,6 +218,13 @@ export const OnboardingView: React.FC = () => {
                 Create Student Profile
               </h2>
             </div>
+
+            {/* Avatar & Illustration Selector */}
+            <AvatarSelector
+              selectedAvatarUrl={avatarUrl}
+              displayName={displayName}
+              onSelectAvatar={setAvatarUrl}
+            />
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">

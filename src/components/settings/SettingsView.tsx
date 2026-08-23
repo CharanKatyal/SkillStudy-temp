@@ -4,7 +4,6 @@ import {
   Moon,
   Sun,
   Laptop,
-  Code2,
   Download,
   Upload,
   RotateCcw,
@@ -15,17 +14,33 @@ import { useApp } from '../../context/AppContext';
 import { backupService } from '../../services/backupService';
 import { Card } from '../common/Card';
 import { Modal } from '../common/Modal';
+import { AvatarSelector } from '../common/AvatarSelector';
 
 export const SettingsView: React.FC = () => {
   const { profile, settings, updateProfile, updateSettings, resetAllData } = useData();
   const { addToast } = useApp();
 
   const [displayName, setDisplayName] = useState(profile?.displayName || 'Student');
-  const [bio, setBio] = useState(profile?.bio || '');
   const [gradeLevel, setGradeLevel] = useState(profile?.gradeLevel || '10th Grade');
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatarUrl || 'avatar-scholar');
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const gradeOptions = [
+    '1st Grade',
+    '2nd Grade',
+    '3rd Grade',
+    '4th Grade',
+    '5th Grade',
+    '6th Grade',
+    '7th Grade',
+    '8th Grade',
+    '9th Grade',
+    '10th Grade',
+    '11th Grade',
+    '12th Grade'
+  ];
 
   const handleProfileSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,9 +48,10 @@ export const SettingsView: React.FC = () => {
     updateProfile({
       ...profile,
       displayName: displayName.trim() || 'Student',
-      bio: bio.trim(),
-      gradeLevel: gradeLevel.trim()
+      gradeLevel: gradeLevel.trim(),
+      avatarUrl: avatarUrl
     });
+    addToast('Profile Updated', 'Your settings and avatar have been saved.', 'success');
   };
 
   const handleThemeChange = (theme: 'dark' | 'light' | 'system') => {
@@ -52,17 +68,6 @@ export const SettingsView: React.FC = () => {
     updateSettings({
       ...settings,
       theme
-    });
-  };
-
-  const handleEditorChange = (field: string, value: any) => {
-    if (!settings) return;
-    updateSettings({
-      ...settings,
-      editor: {
-        ...settings.editor,
-        [field]: value
-      }
     });
   };
 
@@ -109,7 +114,7 @@ export const SettingsView: React.FC = () => {
       <div>
         <h2 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">Settings</h2>
         <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-          Customize your student profile, visual theme, code editor configurations, and data backups.
+          Customize your student profile, avatar, visual theme, and data backups.
         </p>
       </div>
 
@@ -121,6 +126,12 @@ export const SettingsView: React.FC = () => {
         </div>
 
         <form onSubmit={handleProfileSave} className="space-y-4">
+          <AvatarSelector
+            selectedAvatarUrl={avatarUrl}
+            displayName={displayName}
+            onSelectAvatar={setAvatarUrl}
+          />
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Display Name</label>
@@ -133,25 +144,19 @@ export const SettingsView: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Grade Level / Track</label>
-              <input
-                type="text"
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Class / Grade Level</label>
+              <select
                 value={gradeLevel}
                 onChange={e => setGradeLevel(e.target.value)}
-                placeholder="e.g. 10th Grade / Web Development"
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-brand-500 transition"
-              />
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-brand-500 transition cursor-pointer"
+              >
+                {gradeOptions.map(opt => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Bio</label>
-            <textarea
-              value={bio}
-              onChange={e => setBio(e.target.value)}
-              rows={2}
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-brand-500 resize-none transition"
-            />
           </div>
 
           <div className="flex justify-end pt-2">
@@ -210,63 +215,6 @@ export const SettingsView: React.FC = () => {
             <Laptop className="w-5 h-5" />
             <span className="text-xs">System Default</span>
           </button>
-        </div>
-      </Card>
-
-      {/* Editor Preferences */}
-      <Card className="p-6">
-        <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
-          <Code2 className="w-5 h-5 text-brand-600 dark:text-brand-400" />
-          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Code Editor Preferences</h3>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div>
-            <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
-              Editor Font Size: {settings?.editor?.fontSize || 14}px
-            </label>
-            <input
-              type="range"
-              min={12}
-              max={22}
-              step={1}
-              value={settings?.editor?.fontSize || 14}
-              onChange={e => handleEditorChange('fontSize', Number(e.target.value))}
-              className="w-full accent-brand-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">Tab Size</label>
-            <select
-              value={settings?.editor?.tabSize || 2}
-              onChange={e => handleEditorChange('tabSize', Number(e.target.value))}
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none transition"
-            >
-              <option value="2">2 spaces</option>
-              <option value="4">4 spaces</option>
-            </select>
-          </div>
-
-          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-            <span className="text-slate-700 dark:text-slate-300 font-bold">Show Line Numbers</span>
-            <input
-              type="checkbox"
-              checked={settings?.editor?.lineNumbers ?? true}
-              onChange={e => handleEditorChange('lineNumbers', e.target.checked)}
-              className="w-4 h-4 accent-brand-500 rounded cursor-pointer"
-            />
-          </div>
-
-          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
-            <span className="text-slate-700 dark:text-slate-300 font-bold">Word Wrap</span>
-            <input
-              type="checkbox"
-              checked={settings?.editor?.wordWrap ?? true}
-              onChange={e => handleEditorChange('wordWrap', e.target.checked)}
-              className="w-4 h-4 accent-brand-500 rounded cursor-pointer"
-            />
-          </div>
         </div>
       </Card>
 

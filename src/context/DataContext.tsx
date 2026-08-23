@@ -71,8 +71,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshData = useCallback(async () => {
     try {
+      // 1. Fast priority profile check
+      const p = await storageService.getProfile();
+      setProfile(p);
+
+      if (!p) {
+        // First-time visitor / no profile -> immediately unblock to show onboarding
+        setLoading(false);
+        return;
+      }
+
+      // 2. Load remaining stores in parallel for existing profile
       const [
-        p,
         s,
         prog,
         ideProjs,
@@ -82,7 +92,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         achs,
         attempts
       ] = await Promise.all([
-        storageService.getProfile(),
         storageService.getSettings(),
         storageService.getProgress(),
         storageService.getIdeProjects(),
@@ -93,7 +102,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         storageService.getPracticeAttempts()
       ]);
 
-      setProfile(p);
       setSettings(s);
       setProgress(prog);
       setIdeProjects(ideProjs);
