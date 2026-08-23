@@ -86,23 +86,23 @@ export const IDEView: React.FC = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-8.5rem)] flex flex-col rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden shadow-2xl animate-fadeIn">
+    <div className="h-[calc(100vh-8.5rem)] flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xl dark:shadow-2xl animate-fadeIn">
       {/* Top Toolbar */}
-      <div className="h-13 px-3 py-2 bg-slate-850 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 select-none">
+      <div className="h-13 px-3 py-2 bg-slate-50 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 select-none">
         {/* Left: Project selector & Name */}
         <div className="flex items-center gap-2">
           <div className="relative">
             <button
               onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-750 hover:border-slate-600 text-slate-200 text-xs font-bold transition"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-750 hover:border-slate-300 dark:hover:border-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold shadow-sm dark:shadow-none transition"
             >
               <span className="truncate max-w-[140px]">{currentProject.name}</span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </button>
 
             {isProjectDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 w-64 bg-slate-900 border border-slate-750 rounded-xl shadow-2xl z-50 p-1.5 space-y-1">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-2 py-1">
+              <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-750 rounded-xl shadow-2xl z-50 p-1.5 space-y-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 py-1">
                   Your Projects ({ideProjects.length})
                 </div>
                 <div className="max-h-48 overflow-y-auto space-y-0.5">
@@ -115,24 +115,24 @@ export const IDEView: React.FC = () => {
                       }}
                       className={`px-2.5 py-1.5 rounded-lg text-xs cursor-pointer flex items-center justify-between ${
                         proj.id === currentProject.id
-                          ? 'bg-brand-600/20 text-brand-300 font-bold'
-                          : 'text-slate-300 hover:bg-slate-800'
+                          ? 'bg-brand-50 dark:bg-brand-600/20 text-brand-700 dark:text-brand-300 font-bold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                       }`}
                     >
                       <span className="truncate">{proj.name}</span>
-                      <span className="text-[10px] text-slate-500">
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500">
                         {Object.keys(proj.files).length} files
                       </span>
                     </div>
                   ))}
                 </div>
-                <div className="pt-1 border-t border-slate-800 flex flex-col gap-1">
+                <div className="pt-1 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-1">
                   <button
                     onClick={() => {
                       createNewBlankProject(`Project ${ideProjects.length + 1}`);
                       setIsProjectDropdownOpen(false);
                     }}
-                    className="w-full text-left px-2.5 py-1.5 text-xs text-brand-400 hover:bg-slate-800 rounded-lg font-semibold flex items-center gap-1.5"
+                    className="w-full text-left px-2.5 py-1.5 text-xs text-brand-600 dark:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-semibold flex items-center gap-1.5"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>New Blank Project</span>
@@ -142,7 +142,7 @@ export const IDEView: React.FC = () => {
                       setIsTemplatePickerOpen(true);
                       setIsProjectDropdownOpen(false);
                     }}
-                    className="w-full text-left px-2.5 py-1.5 text-xs text-amber-400 hover:bg-slate-800 rounded-lg font-semibold flex items-center gap-1.5"
+                    className="w-full text-left px-2.5 py-1.5 text-xs text-amber-600 dark:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-semibold flex items-center gap-1.5"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>New from Template...</span>
@@ -154,9 +154,9 @@ export const IDEView: React.FC = () => {
 
           <button
             onClick={() => setIsTemplatePickerOpen(true)}
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold border border-slate-750 transition"
+            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-200 dark:border-slate-750 shadow-sm dark:shadow-none transition"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
             <span>Templates</span>
           </button>
         </div>
@@ -184,7 +184,7 @@ export const IDEView: React.FC = () => {
 
           <button
             onClick={stopProject}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-rose-400 border border-slate-700 transition"
+            className="p-1.5 rounded-lg bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none transition"
             title="Stop Sandbox"
           >
             <Square className="w-3.5 h-3.5" />
@@ -193,10 +193,10 @@ export const IDEView: React.FC = () => {
           <button
             onClick={saveCurrentProject}
             disabled={isSaving}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border shadow-sm dark:shadow-none transition ${
               hasUnsavedChanges
-                ? 'bg-amber-950/60 text-amber-300 border-amber-800/80'
-                : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750'
+                ? 'bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/80'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-750'
             }`}
             title="Save Project (Autosave is active)"
           >
@@ -207,7 +207,7 @@ export const IDEView: React.FC = () => {
           {currentProject.templateId && (
             <button
               onClick={resetToTemplate}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               title="Reset Starter Code"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -219,7 +219,7 @@ export const IDEView: React.FC = () => {
         <div className="flex items-center gap-1.5">
           <button
             onClick={exportProjectZip}
-            className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold border border-slate-700 flex items-center gap-1 transition"
+            className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none flex items-center gap-1 transition"
             title="Export as ZIP"
           >
             <Download className="w-3.5 h-3.5" />
@@ -228,7 +228,7 @@ export const IDEView: React.FC = () => {
 
           <button
             onClick={handleImportClick}
-            className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold border border-slate-700 flex items-center gap-1 transition"
+            className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none flex items-center gap-1 transition"
             title="Import ZIP"
           >
             <Upload className="w-3.5 h-3.5" />
@@ -245,11 +245,11 @@ export const IDEView: React.FC = () => {
       </div>
 
       {/* Mobile Tab Switcher (Visible only on small screens) */}
-      <div className="lg:hidden flex border-b border-slate-800 bg-slate-900 text-xs">
+      <div className="lg:hidden flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-xs">
         <button
           onClick={() => setMobileTab('editor')}
           className={`flex-1 py-2 font-bold text-center border-b-2 ${
-            mobileTab === 'editor' ? 'border-brand-500 text-brand-400' : 'border-transparent text-slate-400'
+            mobileTab === 'editor' ? 'border-brand-500 text-brand-600 dark:text-brand-400' : 'border-transparent text-slate-500 dark:text-slate-400'
           }`}
         >
           Editor
@@ -257,7 +257,7 @@ export const IDEView: React.FC = () => {
         <button
           onClick={() => setMobileTab('preview')}
           className={`flex-1 py-2 font-bold text-center border-b-2 ${
-            mobileTab === 'preview' ? 'border-brand-500 text-brand-400' : 'border-transparent text-slate-400'
+            mobileTab === 'preview' ? 'border-brand-500 text-brand-600 dark:text-brand-400' : 'border-transparent text-slate-500 dark:text-slate-400'
           }`}
         >
           Live Preview
@@ -265,7 +265,7 @@ export const IDEView: React.FC = () => {
         <button
           onClick={() => setMobileTab('console')}
           className={`flex-1 py-2 font-bold text-center border-b-2 ${
-            mobileTab === 'console' ? 'border-brand-500 text-brand-400' : 'border-transparent text-slate-400'
+            mobileTab === 'console' ? 'border-brand-500 text-brand-600 dark:text-brand-400' : 'border-transparent text-slate-500 dark:text-slate-400'
           }`}
         >
           Console
@@ -281,12 +281,12 @@ export const IDEView: React.FC = () => {
 
         {/* Center: Tabs + Code Editor + Console */}
         <div
-          className={`flex-1 flex flex-col min-w-0 border-r border-slate-800 ${
+          className={`flex-1 flex flex-col min-w-0 border-r border-slate-200 dark:border-slate-800 ${
             mobileTab === 'editor' ? 'flex' : 'hidden lg:flex'
           }`}
         >
           {/* File Tabs Bar */}
-          <div className="h-9 bg-slate-900 border-b border-slate-800 flex items-center px-2 gap-1 overflow-x-auto select-none">
+          <div className="h-9 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-2 gap-1 overflow-x-auto select-none">
             {openTabs.map(tabName => {
               const isActive = activeFileName === tabName;
 
@@ -296,8 +296,8 @@ export const IDEView: React.FC = () => {
                   onClick={() => openFileInTab(tabName)}
                   className={`flex items-center gap-2 px-3 py-1 rounded-t-lg text-xs cursor-pointer border-t-2 transition ${
                     isActive
-                      ? 'bg-slate-950 text-slate-100 font-semibold border-brand-500'
-                      : 'bg-slate-900 text-slate-400 hover:text-slate-200 border-transparent'
+                      ? 'bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-semibold border-brand-500 shadow-sm'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border-transparent'
                   }`}
                 >
                   <span className="truncate max-w-[120px]">{tabName}</span>
@@ -307,7 +307,7 @@ export const IDEView: React.FC = () => {
                         e.stopPropagation();
                         closeTab(tabName);
                       }}
-                      className="p-0.5 rounded text-slate-500 hover:text-slate-200 hover:bg-slate-800"
+                      className="p-0.5 rounded text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800"
                     >
                       <X className="w-3 h-3" />
                     </button>

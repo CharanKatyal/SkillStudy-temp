@@ -80,7 +80,7 @@ export const AIAssistantDrawer: React.FC = () => {
           className={`py-1.5 rounded-lg transition ${
             activeTab === 'overview'
               ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
           }`}
         >
           Offline Architecture
@@ -90,7 +90,7 @@ export const AIAssistantDrawer: React.FC = () => {
           className={`py-1.5 rounded-lg transition ${
             activeTab === 'features'
               ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
           }`}
         >
           Planned Features

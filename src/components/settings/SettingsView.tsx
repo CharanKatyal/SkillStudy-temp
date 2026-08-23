@@ -177,12 +177,12 @@ export const SettingsView: React.FC = () => {
             onClick={() => handleThemeChange('dark')}
             className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition ${
               settings?.theme === 'dark'
-                ? 'bg-slate-100 dark:bg-slate-900 border-brand-500 text-brand-600 dark:text-brand-400 ring-2 ring-brand-500/20'
+                ? 'bg-brand-50 dark:bg-slate-900 border-brand-500 text-brand-700 dark:text-brand-400 ring-2 ring-brand-500/20 font-bold shadow-sm'
                 : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
             }`}
           >
             <Moon className="w-5 h-5" />
-            <span className="text-xs font-bold">Dark Theme</span>
+            <span className="text-xs">Dark Theme</span>
           </button>
 
           <button
@@ -190,12 +190,12 @@ export const SettingsView: React.FC = () => {
             onClick={() => handleThemeChange('light')}
             className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition ${
               settings?.theme === 'light'
-                ? 'bg-slate-100 dark:bg-slate-900 border-brand-500 text-brand-600 dark:text-brand-400 ring-2 ring-brand-500/20'
+                ? 'bg-brand-50 dark:bg-slate-900 border-brand-500 text-brand-700 dark:text-brand-400 ring-2 ring-brand-500/20 font-bold shadow-sm'
                 : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
             }`}
           >
             <Sun className="w-5 h-5 text-amber-500" />
-            <span className="text-xs font-bold">Light Theme</span>
+            <span className="text-xs">Light Theme</span>
           </button>
 
           <button
@@ -203,12 +203,12 @@ export const SettingsView: React.FC = () => {
             onClick={() => handleThemeChange('system')}
             className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition ${
               settings?.theme === 'system'
-                ? 'bg-slate-100 dark:bg-slate-900 border-brand-500 text-brand-600 dark:text-brand-400 ring-2 ring-brand-500/20'
+                ? 'bg-brand-50 dark:bg-slate-900 border-brand-500 text-brand-700 dark:text-brand-400 ring-2 ring-brand-500/20 font-bold shadow-sm'
                 : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
             }`}
           >
             <Laptop className="w-5 h-5" />
-            <span className="text-xs font-bold">System Default</span>
+            <span className="text-xs">System Default</span>
           </button>
         </div>
       </Card>
