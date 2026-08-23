@@ -13,14 +13,6 @@ import {
 import { INITIAL_ACHIEVEMENTS } from '../data/defaultAchievements';
 import { PROJECT_TEMPLATES } from '../data/projectTemplates';
 
-const DEFAULT_PROFILE: UserProfile = {
-  displayName: 'Alex Scholar',
-  bio: 'Offline-first student learning modern web engineering, algorithms, and academic subjects.',
-  gradeLevel: 'High School / Self-Taught',
-  avatarIcon: 'GraduationCap',
-  joinedAt: new Date().toISOString()
-};
-
 const DEFAULT_SETTINGS: UserSettings = {
   theme: 'dark',
   editor: {
@@ -70,7 +62,7 @@ const DEFAULT_PORTFOLIO: PortfolioData = {
   showAchievements: true,
   showStats: true,
   socialLinks: {
-    github: 'https://github.com',
+    github: '',
     website: '',
     email: ''
   }
@@ -78,13 +70,9 @@ const DEFAULT_PORTFOLIO: PortfolioData = {
 
 export class StorageService {
   // --- Profile ---
-  async getProfile(): Promise<UserProfile> {
+  async getProfile(): Promise<UserProfile | null> {
     const data = await db.get<UserProfile>(STORES.PROFILE, 'current_user');
-    if (!data) {
-      await this.saveProfile(DEFAULT_PROFILE);
-      return DEFAULT_PROFILE;
-    }
-    return data;
+    return data || null;
   }
 
   async saveProfile(profile: UserProfile): Promise<void> {

@@ -14,7 +14,7 @@ export interface SkudiumBackup {
   version: string | number;
   exportedAt: string;
   app: 'Skudium' | 'SkillForge' | 'StillSkudy';
-  profile: UserProfile;
+  profile: UserProfile | null;
   settings: UserSettings;
   progress: UserProgressState;
   ideProjects: IdeProject[];

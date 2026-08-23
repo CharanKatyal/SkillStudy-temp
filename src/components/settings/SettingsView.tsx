@@ -20,8 +20,8 @@ export const SettingsView: React.FC = () => {
   const { profile, settings, updateProfile, updateSettings, resetAllData } = useData();
   const { addToast } = useApp();
 
-  const [displayName, setDisplayName] = useState(profile?.displayName || 'Alex Scholar');
-  const [bio, setBio] = useState(profile?.bio || 'Building web applications with Skudium.');
+  const [displayName, setDisplayName] = useState(profile?.displayName || 'Student');
+  const [bio, setBio] = useState(profile?.bio || '');
   const [gradeLevel, setGradeLevel] = useState(profile?.gradeLevel || '10th Grade');
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 

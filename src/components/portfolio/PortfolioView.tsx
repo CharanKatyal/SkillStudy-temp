@@ -65,13 +65,13 @@ export const PortfolioView: React.FC = () => {
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
-                {profile?.displayName || 'Alex Scholar'}
+                {profile?.displayName || 'Student'}
               </h1>
               <p className="text-sm font-bold text-brand-600 dark:text-brand-400 mt-0.5">
                 {portfolio?.customTitle || 'Student Developer & Thinker'}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {profile?.gradeLevel || 'High School / Self-Taught'}
+                {profile?.gradeLevel || '10th Grade'}
               </p>
             </div>
           </div>

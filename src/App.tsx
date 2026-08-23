@@ -18,20 +18,10 @@ import { PortfolioView } from './components/portfolio/PortfolioView';
 import { AchievementsView } from './components/achievements/AchievementsView';
 import { SettingsView } from './components/settings/SettingsView';
 
+import { OnboardingView } from './components/auth/OnboardingView';
+
 const MainViewRouter: React.FC = () => {
   const { activeNav } = useApp();
-  const { loading } = useData();
-
-  if (loading) {
-    return (
-      <div className="h-[60vh] flex flex-col items-center justify-center space-y-3">
-        <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold tracking-wide">
-          Loading Skudium Studio...
-        </p>
-      </div>
-    );
-  }
 
   switch (activeNav) {
     case 'dashboard':
@@ -61,6 +51,34 @@ const MainViewRouter: React.FC = () => {
   }
 };
 
+const MainAppContent: React.FC = () => {
+  const { loading, profile } = useData();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
+        <div className="text-center space-y-1">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Skudium Studio</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold tracking-wide">
+            Checking local offline workspace...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return <OnboardingView />;
+  }
+
+  return (
+    <AppLayout>
+      <MainViewRouter />
+    </AppLayout>
+  );
+};
+
 export function App() {
   return (
     <AppProvider>
@@ -68,9 +86,7 @@ export function App() {
         <DataProvider>
           <IDEProvider>
             <AIProvider>
-              <AppLayout>
-                <MainViewRouter />
-              </AppLayout>
+              <MainAppContent />
             </AIProvider>
           </IDEProvider>
         </DataProvider>

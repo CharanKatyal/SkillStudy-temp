@@ -16,9 +16,9 @@ export type SupportedLanguage = 'html' | 'css' | 'javascript' | 'python' | 'cpp'
 
 export interface UserProfile {
   displayName: string;
-  bio: string;
+  bio?: string;
   gradeLevel: string;
-  avatarIcon: string;
+  avatarIcon?: string;
   joinedAt: string;
 }
 

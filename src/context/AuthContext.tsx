@@ -28,26 +28,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { addToast } = useApp();
   const [user, setUser] = useState<AuthUser | null>(() => {
     const raw = localStorage.getItem('skudium_user_profile');
-    return raw ? JSON.parse(raw) : {
-      id: 'local-student-1',
-      email: 'student@skudium.local',
-      displayName: 'Alex Scholar',
-      role: 'student',
-      gradeLevel: '10th Grade'
-    };
+    return raw ? JSON.parse(raw) : null;
   });
 
-  const [linkedStudents, setLinkedStudents] = useState<ParentStudentLink[]>([
-    {
-      id: 'link-default',
-      parentId: 'local-parent-1',
-      studentId: 'local-student-1',
-      studentName: 'Alex Scholar',
-      studentEmail: 'student@skudium.local',
-      status: 'active',
-      createdAt: new Date().toISOString()
-    }
-  ]);
+  const [linkedStudents, setLinkedStudents] = useState<ParentStudentLink[]>([]);
 
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
     status: 'synced',
@@ -93,16 +77,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    const defaultStudent: AuthUser = {
-      id: 'local-student-1',
-      email: 'student@skudium.local',
-      displayName: 'Alex Scholar',
-      role: 'student',
-      gradeLevel: '10th Grade'
-    };
-    setUser(defaultStudent);
-    localStorage.setItem('skudium_user_profile', JSON.stringify(defaultStudent));
-    addToast('Reset to Default Student', 'Your local offline progress is safely stored in IndexedDB.', 'info');
+    setUser(null);
+    localStorage.removeItem('skudium_user_profile');
+    addToast('Logged Out', 'User profile session ended.', 'info');
   };
 
   const generateStudentLinkCode = async (): Promise<string> => {
