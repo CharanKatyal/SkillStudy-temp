@@ -16,15 +16,13 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
 
   const titles: Record<string, { title: string; subtitle: string }> = {
     dashboard: { title: 'Dashboard', subtitle: 'Overview of your learning progress and projects' },
-    academics: { title: 'Academic Studies', subtitle: 'Structured mathematics, science, and english curricula' },
+    academics: { title: 'Academics & Learning', subtitle: 'Structured subject curricula, master roadmaps, and lesson readers' },
     skills: { title: 'Practical Skills', subtitle: 'Modern web development, programming, tools, and UI/UX design' },
-    learn: { title: 'Learning Paths', subtitle: 'Interactive step-by-step master roadmaps' },
     practice: { title: 'Practice Hub', subtitle: 'Quizzes, conceptual assessments, and coding challenges' },
     ide: { title: 'Code Studio', subtitle: 'Multi-language editor with live browser runtime & console' },
     projects: { title: 'Projects', subtitle: 'Milestone management, task checklists, and workspace links' },
     planner: { title: 'Study Planner', subtitle: 'Interactive timetable and scheduled study tasks' },
-    portfolio: { title: 'Student Portfolio', subtitle: 'Exportable showcase of verified skills and projects' },
-    achievements: { title: 'Achievements', subtitle: 'Unlock badges and celebrate learning milestones' },
+    achievements: { title: 'Achievements & Portfolio', subtitle: 'Unlock badges, track honors, and view student transcript' },
     settings: { title: 'Settings', subtitle: 'Profile preferences, avatar, and local data backup' }
   };
 
@@ -41,15 +39,23 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   };
 
   const toggleTheme = () => {
-    if (!settings) return;
-    const isDark = document.documentElement.classList.contains('dark');
-    const nextTheme = isDark ? 'light' : 'dark';
+    const root = document.documentElement;
+    const isDark = root.classList.contains('dark');
+    const nextTheme: 'dark' | 'light' = isDark ? 'light' : 'dark';
+
     if (nextTheme === 'dark') {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
     }
-    updateSettings({ ...settings, theme: nextTheme });
+
+    const currentSettings = settings || {
+      theme: nextTheme,
+      editor: { fontSize: 14, tabSize: 2, lineNumbers: true, wordWrap: true },
+      accessibility: { highContrast: false, reducedMotion: false, dyslexicFont: false }
+    };
+
+    updateSettings({ ...currentSettings, theme: nextTheme });
   };
 
   return (

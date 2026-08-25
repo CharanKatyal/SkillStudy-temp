@@ -9,12 +9,10 @@ import { AppLayout } from './components/layout/AppLayout';
 import { DashboardView } from './components/dashboard/DashboardView';
 import { AcademicsView } from './components/academics/AcademicsView';
 import { SkillsView } from './components/skills/SkillsView';
-import { LearnView } from './components/learn/LearnView';
 import { PracticeView } from './components/practice/PracticeView';
 import { IDEView } from './components/ide/IDEView';
 import { ProjectsView } from './components/projects/ProjectsView';
 import { PlannerView } from './components/planner/PlannerView';
-import { PortfolioView } from './components/portfolio/PortfolioView';
 import { AchievementsView } from './components/achievements/AchievementsView';
 import { SettingsView } from './components/settings/SettingsView';
 
@@ -27,11 +25,10 @@ const MainViewRouter: React.FC = () => {
     case 'dashboard':
       return <DashboardView />;
     case 'academics':
+    case 'learn':
       return <AcademicsView />;
     case 'skills':
       return <SkillsView />;
-    case 'learn':
-      return <LearnView />;
     case 'practice':
       return <PracticeView />;
     case 'ide':
@@ -41,7 +38,6 @@ const MainViewRouter: React.FC = () => {
     case 'planner':
       return <PlannerView />;
     case 'portfolio':
-      return <PortfolioView />;
     case 'achievements':
       return <AchievementsView />;
     case 'settings':

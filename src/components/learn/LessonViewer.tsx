@@ -210,7 +210,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({ lesson, allLessons, 
       <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
         {prevLesson ? (
           <button
-            onClick={() => setActiveNav('learn', { lessonId: prevLesson.id })}
+            onClick={() => setActiveNav('academics', { lessonId: prevLesson.id })}
             className="flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -222,7 +222,7 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({ lesson, allLessons, 
 
         {nextLesson && (
           <button
-            onClick={() => setActiveNav('learn', { lessonId: nextLesson.id })}
+            onClick={() => setActiveNav('academics', { lessonId: nextLesson.id })}
             className="flex items-center gap-2 text-xs font-bold text-white px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 shadow-md transition"
           >
             <span className="truncate max-w-[150px]">{nextLesson.title}</span>

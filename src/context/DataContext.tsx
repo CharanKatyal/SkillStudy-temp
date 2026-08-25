@@ -71,19 +71,35 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshData = useCallback(async () => {
     try {
-      // 1. Fast priority profile check
-      const p = await storageService.getProfile();
+      // 1. Load profile and settings first
+      const [p, s] = await Promise.all([
+        storageService.getProfile(),
+        storageService.getSettings()
+      ]);
+
       setProfile(p);
+      setSettings(s);
+
+      // Immediately sync DOM theme
+      const root = document.documentElement;
+      if (s?.theme === 'light') {
+        root.classList.remove('dark');
+      } else if (s?.theme === 'dark') {
+        root.classList.add('dark');
+      } else {
+        const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (isSystemDark) root.classList.add('dark');
+        else root.classList.remove('dark');
+      }
 
       if (!p) {
-        // First-time visitor / no profile -> immediately unblock to show onboarding
+        // First-time visitor / no profile -> immediately unblock
         setLoading(false);
         return;
       }
 
       // 2. Load remaining stores in parallel for existing profile
       const [
-        s,
         prog,
         ideProjs,
         manProjs,
@@ -92,7 +108,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         achs,
         attempts
       ] = await Promise.all([
-        storageService.getSettings(),
         storageService.getProgress(),
         storageService.getIdeProjects(),
         storageService.getManagedProjects(),
@@ -102,7 +117,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         storageService.getPracticeAttempts()
       ]);
 
-      setSettings(s);
       setProgress(prog);
       setIdeProjects(ideProjs);
       setManagedProjects(manProjs);
@@ -121,7 +135,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     refreshData();
   }, [refreshData]);
 
-  // Apply theme class to <html> element
+  // Apply theme class to <html> element whenever settings change
   useEffect(() => {
     if (settings) {
       const root = document.documentElement;
@@ -130,7 +144,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else if (settings.theme === 'light') {
         root.classList.remove('dark');
       } else {
-        // System preference
         const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (isSystemDark) root.classList.add('dark');
         else root.classList.remove('dark');
@@ -141,10 +154,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (newProfile: UserProfile) => {
     await storageService.saveProfile(newProfile);
     setProfile(newProfile);
+    if (!settings) {
+      await refreshData();
+    }
     addToast('Profile Updated', 'Your profile details have been saved locally.', 'success');
   };
 
   const updateSettings = async (newSettings: UserSettings) => {
+    const root = document.documentElement;
+    if (newSettings.theme === 'dark') {
+      root.classList.add('dark');
+    } else if (newSettings.theme === 'light') {
+      root.classList.remove('dark');
+    } else {
+      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (isSystemDark) root.classList.add('dark');
+      else root.classList.remove('dark');
+    }
     await storageService.saveSettings(newSettings);
     setSettings(newSettings);
   };

@@ -98,7 +98,7 @@ export const SkillsView: React.FC = () => {
                 return (
                   <div
                     key={lesson.id}
-                    onClick={() => setActiveNav('learn', { lessonId: lesson.id })}
+                    onClick={() => setActiveNav('academics', { lessonId: lesson.id })}
                     className={`p-3.5 rounded-xl border flex items-center justify-between cursor-pointer transition ${
                       isDone
                         ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/50 hover:border-emerald-400'

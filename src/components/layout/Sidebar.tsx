@@ -37,12 +37,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'academics', label: 'Academics', icon: GraduationCap },
     { id: 'skills', label: 'Skills', icon: Sparkles },
-    { id: 'learn', label: 'Learn', icon: BookOpen },
     { id: 'practice', label: 'Practice', icon: CheckCircle2 },
     { id: 'ide', label: 'IDE Studio', icon: Code2 },
     { id: 'projects', label: 'Projects', icon: FolderKanban },
     { id: 'planner', label: 'Planner', icon: CalendarCheck },
-    { id: 'portfolio', label: 'Portfolio', icon: Award },
     { id: 'achievements', label: 'Achievements', icon: Trophy },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];

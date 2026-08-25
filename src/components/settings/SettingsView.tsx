@@ -55,18 +55,25 @@ export const SettingsView: React.FC = () => {
   };
 
   const handleThemeChange = (theme: 'dark' | 'light' | 'system') => {
-    if (!settings) return;
+    const root = document.documentElement;
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
     } else if (theme === 'light') {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
     } else {
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (isDark) document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
+      if (isDark) root.classList.add('dark');
+      else root.classList.remove('dark');
     }
+
+    const currentSettings = settings || {
+      theme,
+      editor: { fontSize: 14, tabSize: 2, lineNumbers: true, wordWrap: true },
+      accessibility: { highContrast: false, reducedMotion: false, dyslexicFont: false }
+    };
+
     updateSettings({
-      ...settings,
+      ...currentSettings,
       theme
     });
   };

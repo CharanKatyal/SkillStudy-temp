@@ -11,7 +11,7 @@ export const AdaptiveRecommendationsCard: React.FC = () => {
 
   const handleActionClick = (action: any) => {
     if (action.type === 'lesson') {
-      setActiveNav('learn', { lessonId: action.targetId });
+      setActiveNav('academics', { lessonId: action.targetId });
     } else if (action.type === 'challenge') {
       setActiveNav('skills');
     } else if (action.type === 'quiz') {

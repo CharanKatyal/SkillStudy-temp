@@ -11,12 +11,10 @@ import {
   Clock,
   Play,
   FolderKanban,
-  Target,
-  Bot
+  Target
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useData } from '../../context/DataContext';
-import { useAI } from '../../context/AIContext';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { ProgressBar } from '../common/ProgressBar';
@@ -26,7 +24,6 @@ import { SKILL_SUBJECTS } from '../../data/skillData';
 
 export const DashboardView: React.FC = () => {
   const { setActiveNav, setSelectedSubjectId, setSelectedSkillId } = useApp();
-  const { setIsDrawerOpen } = useAI();
   const {
     profile,
     progress,
@@ -77,13 +74,6 @@ export const DashboardView: React.FC = () => {
             >
               <Code2 className="w-4 h-4" />
               <span>Open Studio</span>
-            </button>
-            <button
-              onClick={() => setIsDrawerOpen(true)}
-              className="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-800 dark:text-brand-300 border border-slate-200 dark:border-brand-800/40 font-semibold text-sm flex items-center gap-2 shadow-sm transition"
-            >
-              <Bot className="w-4 h-4 text-brand-600 dark:text-brand-400" />
-              <span>AI Assistant</span>
             </button>
           </div>
         </div>
@@ -189,7 +179,7 @@ export const DashboardView: React.FC = () => {
 
             {todayTasks.length === 0 ? (
               <div className="text-center py-6 text-slate-500 dark:text-slate-400 text-sm">
-                <p>No tasks scheduled for today. Add study tasks in your planner or generate an AI timetable!</p>
+                <p>No tasks scheduled for today. Add study tasks in your planner to stay on track!</p>
               </div>
             ) : (
               <div className="space-y-2.5">
