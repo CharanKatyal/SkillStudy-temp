@@ -219,46 +219,54 @@ export const SkillsView: React.FC = () => {
       </div>
 
       {/* Grid of Skills */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {filteredSkills.map(skill => {
-          const completedLessons = skill.lessons.filter(l => progress?.completedLessons?.[l.id]).length;
-          const pct = Math.round((completedLessons / (skill.lessons.length || 1)) * 100);
+      {filteredSkills.length === 0 ? (
+        <Card className="p-12 text-center text-slate-500 dark:text-slate-400">
+          <Code2 className="w-12 h-12 mx-auto mb-3 text-slate-400 opacity-50" />
+          <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No Practical Skills Available</h3>
+          <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Practical skills and coding tracks are currently empty.</p>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {filteredSkills.map(skill => {
+            const completedLessons = skill.lessons.filter(l => progress?.completedLessons?.[l.id]).length;
+            const pct = Math.round((completedLessons / (skill.lessons.length || 1)) * 100);
 
-          return (
-            <Card
-              key={skill.id}
-              hoverable
-              onClick={() => setSelectedSkillId(skill.id)}
-              className="flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow"
-                    style={{ backgroundColor: skill.color }}
-                  >
-                    <Code2 className="w-5 h-5" />
+            return (
+              <Card
+                key={skill.id}
+                hoverable
+                onClick={() => setSelectedSkillId(skill.id)}
+                className="flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow"
+                      style={{ backgroundColor: skill.color }}
+                    >
+                      <Code2 className="w-5 h-5" />
+                    </div>
+                    <Badge size="sm">{skill.difficulty}</Badge>
                   </div>
-                  <Badge size="sm">{skill.difficulty}</Badge>
+
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">{skill.name}</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                    {skill.description}
+                  </p>
                 </div>
 
-                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">{skill.name}</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-                  {skill.description}
-                </p>
-              </div>
-
-              <div className="mt-5 pt-3 border-t border-slate-200 dark:border-slate-800">
-                <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
-                  <span>{skill.lessons.length} Lessons</span>
-                  <span className="font-bold text-slate-900 dark:text-slate-200">{pct}%</span>
+                <div className="mt-5 pt-3 border-t border-slate-200 dark:border-slate-800">
+                  <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
+                    <span>{skill.lessons.length} Lessons</span>
+                    <span className="font-bold text-slate-900 dark:text-slate-200">{pct}%</span>
+                  </div>
+                  <ProgressBar value={pct} color="bg-brand-500" height="sm" />
                 </div>
-                <ProgressBar value={pct} color="bg-brand-500" height="sm" />
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

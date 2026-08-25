@@ -242,38 +242,44 @@ export const DashboardView: React.FC = () => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {ACADEMIC_SUBJECTS.map(subject => {
-                const subjectLessons = subject.chapters.flatMap(c => c.topics.flatMap(t => t.lessons));
-                const completedInSubj = subjectLessons.filter(
-                  l => progress?.completedLessons?.[l.id]
-                ).length;
-                const percentage = Math.round((completedInSubj / (subjectLessons.length || 1)) * 100);
+            {ACADEMIC_SUBJECTS.length === 0 ? (
+              <div className="text-center py-6 text-slate-500 dark:text-slate-400 text-xs">
+                <p>No academic subjects configured yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {ACADEMIC_SUBJECTS.map(subject => {
+                  const subjectLessons = subject.chapters.flatMap(c => c.topics.flatMap(t => t.lessons));
+                  const completedInSubj = subjectLessons.filter(
+                    l => progress?.completedLessons?.[l.id]
+                  ).length;
+                  const percentage = Math.round((completedInSubj / (subjectLessons.length || 1)) * 100);
 
-                return (
-                  <div
-                    key={subject.id}
-                    onClick={() => {
-                      setSelectedSubjectId(subject.id);
-                      setActiveNav('academics');
-                    }}
-                    className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-brand-500/50 hover:bg-white dark:hover:bg-slate-850 cursor-pointer shadow-sm dark:shadow-none transition flex flex-col justify-between"
-                  >
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-200">{subject.name}</h4>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">{subject.description}</p>
-                    </div>
-                    <div className="mt-4">
-                      <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
-                        <span>{completedInSubj} / {subjectLessons.length} lessons</span>
-                        <span className="font-semibold text-slate-900 dark:text-slate-200">{percentage}%</span>
+                  return (
+                    <div
+                      key={subject.id}
+                      onClick={() => {
+                        setSelectedSubjectId(subject.id);
+                        setActiveNav('academics');
+                      }}
+                      className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-brand-500/50 hover:bg-white dark:hover:bg-slate-850 cursor-pointer shadow-sm dark:shadow-none transition flex flex-col justify-between"
+                    >
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-200">{subject.name}</h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">{subject.description}</p>
                       </div>
-                      <ProgressBar value={percentage} color="bg-sky-500" height="sm" />
+                      <div className="mt-4">
+                        <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
+                          <span>{completedInSubj} / {subjectLessons.length} lessons</span>
+                          <span className="font-semibold text-slate-900 dark:text-slate-200">{percentage}%</span>
+                        </div>
+                        <ProgressBar value={percentage} color="bg-sky-500" height="sm" />
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </Card>
         </div>
 

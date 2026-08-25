@@ -112,33 +112,41 @@ export const PracticeView: React.FC = () => {
             )}
           </div>
 
-          <div className="space-y-3">
-            {filteredQuestions.map((q, idx) => (
-              <Card key={q.id} className="p-4 flex items-start justify-between gap-4">
-                <div className="space-y-1.5 flex-1">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="info">
-                      {q.type.replace('_', ' ')}
-                    </Badge>
+          {filteredQuestions.length === 0 ? (
+            <Card className="p-12 text-center text-slate-500 dark:text-slate-400">
+              <FileQuestion className="w-12 h-12 mx-auto mb-3 text-slate-400 opacity-50" />
+              <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No Practice Questions Found</h3>
+              <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Practice questions are currently empty.</p>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {filteredQuestions.map((q, idx) => (
+                <Card key={q.id} className="p-4 flex items-start justify-between gap-4">
+                  <div className="space-y-1.5 flex-1">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="info">
+                        {q.type.replace('_', ' ')}
+                      </Badge>
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 leading-snug">
+                      <span className="text-brand-600 dark:text-brand-400 font-bold mr-1.5">Q{idx + 1}.</span>
+                      {q.question}
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                      Topic: {q.topicTitle}
+                    </p>
                   </div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-200 leading-snug">
-                    <span className="text-brand-600 dark:text-brand-400 font-bold mr-1.5">Q{idx + 1}.</span>
-                    {q.question}
-                  </h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 italic">
-                    Topic: {q.topicTitle}
-                  </p>
-                </div>
 
-                <button
-                  onClick={() => startQuiz(q.question, [q], q.subjectOrSkillId)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-slate-700 dark:text-slate-300 text-xs font-bold shrink-0 transition"
-                >
-                  Practice
-                </button>
-              </Card>
-            ))}
-          </div>
+                  <button
+                    onClick={() => startQuiz(q.question, [q], q.subjectOrSkillId)}
+                    className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-slate-700 dark:text-slate-300 text-xs font-bold shrink-0 transition"
+                  >
+                    Practice
+                  </button>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Practice History Column */}

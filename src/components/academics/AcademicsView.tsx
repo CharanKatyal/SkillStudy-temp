@@ -33,7 +33,7 @@ export const AcademicsView: React.FC = () => {
   const { progress } = useData();
 
   const [activeTab, setActiveTab] = useState<'subjects' | 'roadmaps'>('subjects');
-  const [activePathId, setActivePathId] = useState<string>(LEARNING_PATHS[0].id);
+  const [activePathId, setActivePathId] = useState<string>(LEARNING_PATHS[0]?.id || '');
 
   // Gather all lessons across academics and skills for lookup
   const allAcademicLessons = ACADEMIC_SUBJECTS.flatMap(s =>
@@ -71,7 +71,7 @@ export const AcademicsView: React.FC = () => {
         <div className="flex items-center justify-between">
           <button
             onClick={() => setSelectedSubjectId(null)}
-            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-750 shadow-sm transition"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Academics</span>
@@ -177,17 +177,17 @@ export const AcademicsView: React.FC = () => {
   }
 
   // 3. Top-Level Unified Academics & Learning Roadmaps View
-  const currentPath = LEARNING_PATHS.find(p => p.id === activePathId) || LEARNING_PATHS[0];
+  const currentPath = LEARNING_PATHS.find(p => p.id === activePathId) || LEARNING_PATHS[0] || null;
 
-  const completedStepsCount = currentPath.steps.filter(step => {
+  const completedStepsCount = currentPath?.steps ? currentPath.steps.filter(step => {
     if (step.lessonId && progress?.completedLessons?.[step.lessonId]) return true;
     if (step.challengeId && progress?.completedChallenges?.[step.challengeId]) return true;
     return false;
-  }).length;
+  }).length : 0;
 
-  const pathProgressPercent = Math.round(
+  const pathProgressPercent = currentPath?.steps ? Math.round(
     (completedStepsCount / (currentPath.steps.length || 1)) * 100
-  );
+  ) : 0;
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -231,186 +231,202 @@ export const AcademicsView: React.FC = () => {
 
       {activeTab === 'subjects' ? (
         /* Academic Subjects Grid */
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {ACADEMIC_SUBJECTS.map(subject => {
-            const subjectLessons = subject.chapters.flatMap(c => c.topics.flatMap(t => t.lessons));
-            const completedCount = subjectLessons.filter(l => progress?.completedLessons?.[l.id]).length;
-            const percentage = Math.round((completedCount / (subjectLessons.length || 1)) * 100);
+        ACADEMIC_SUBJECTS.length === 0 ? (
+          <Card className="p-12 text-center text-slate-500 dark:text-slate-400">
+            <GraduationCap className="w-12 h-12 mx-auto mb-3 text-slate-400 opacity-50" />
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No Academic Subjects Available</h3>
+            <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Academic curriculum content is currently empty.</p>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {ACADEMIC_SUBJECTS.map(subject => {
+              const subjectLessons = subject.chapters.flatMap(c => c.topics.flatMap(t => t.lessons));
+              const completedCount = subjectLessons.filter(l => progress?.completedLessons?.[l.id]).length;
+              const percentage = Math.round((completedCount / (subjectLessons.length || 1)) * 100);
 
-            return (
-              <Card
-                key={subject.id}
-                hoverable
-                onClick={() => setSelectedSubjectId(subject.id)}
-                className="flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md"
-                      style={{ backgroundColor: subject.color }}
-                    >
-                      <GraduationCap className="w-6 h-6" />
+              return (
+                <Card
+                  key={subject.id}
+                  hoverable
+                  onClick={() => setSelectedSubjectId(subject.id)}
+                  className="flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md"
+                        style={{ backgroundColor: subject.color }}
+                      >
+                        <GraduationCap className="w-6 h-6" />
+                      </div>
+                      <Badge variant="info">{subject.chapters.length} Chapters</Badge>
                     </div>
-                    <Badge variant="info">{subject.chapters.length} Chapters</Badge>
+
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{subject.name}</h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 line-clamp-3 leading-relaxed">
+                      {subject.description}
+                    </p>
                   </div>
 
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{subject.name}</h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 line-clamp-3 leading-relaxed">
-                    {subject.description}
-                  </p>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
-                  <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1.5">
-                    <span>{completedCount} / {subjectLessons.length} lessons</span>
-                    <span className="font-bold text-slate-900 dark:text-slate-200">{percentage}%</span>
+                  <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
+                    <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1.5">
+                      <span>{completedCount} / {subjectLessons.length} lessons</span>
+                      <span className="font-bold text-slate-900 dark:text-slate-200">{percentage}%</span>
+                    </div>
+                    <ProgressBar value={percentage} color="bg-sky-500" height="sm" />
+                    <button className="w-full mt-4 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition">
+                      <span>Explore Subject</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <ProgressBar value={percentage} color="bg-sky-500" height="sm" />
-                  <button className="w-full mt-4 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition">
-                    <span>Explore Subject</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+                </Card>
+              );
+            })}
+          </div>
+        )
       ) : (
         /* Learning Roadmaps Mode */
-        <div className="space-y-6">
-          {/* Path Selector Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-            {LEARNING_PATHS.map(path => (
-              <button
-                key={path.id}
-                onClick={() => setActivePathId(path.id)}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${
-                  activePathId === path.id
-                    ? 'bg-brand-600 text-white shadow-md'
-                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-750'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>{path.title}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Path Header Overview */}
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-brand-50/60 via-white to-white dark:from-slate-850 dark:via-slate-850 dark:to-slate-900 border border-slate-200 dark:border-slate-750 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Badge variant="info">{currentPath.difficulty}</Badge>
-                <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
-                  ~{currentPath.estimatedHours} hours total
-                </span>
-              </div>
-              <h2 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">{currentPath.title}</h2>
-              <p className="text-sm text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">{currentPath.description}</p>
+        LEARNING_PATHS.length === 0 || !currentPath ? (
+          <Card className="p-12 text-center text-slate-500 dark:text-slate-400">
+            <Map className="w-12 h-12 mx-auto mb-3 text-slate-400 opacity-50" />
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No Learning Roadmaps Available</h3>
+            <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">Learning roadmaps are currently empty.</p>
+          </Card>
+        ) : (
+          <div className="space-y-6">
+            {/* Path Selector Tabs */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+              {LEARNING_PATHS.map(path => (
+                <button
+                  key={path.id}
+                  onClick={() => setActivePathId(path.id)}
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${
+                    activePathId === path.id
+                      ? 'bg-brand-600 text-white shadow-md'
+                      : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-750'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{path.title}</span>
+                </button>
+              ))}
             </div>
 
-            <div className="w-full md:w-64 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shrink-0 shadow-sm">
-              <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1.5">
-                <span>Roadmap Completion</span>
-                <span className="font-bold text-slate-900 dark:text-slate-200">{pathProgressPercent}%</span>
+            {/* Path Header Overview */}
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-brand-50/60 via-white to-white dark:from-slate-850 dark:via-slate-850 dark:to-slate-900 border border-slate-200 dark:border-slate-750 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="info">{currentPath.difficulty}</Badge>
+                  <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    ~{currentPath.estimatedHours} hours total
+                  </span>
+                </div>
+                <h2 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">{currentPath.title}</h2>
+                <p className="text-sm text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">{currentPath.description}</p>
               </div>
-              <ProgressBar value={pathProgressPercent} color="bg-brand-500" height="md" />
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-                {completedStepsCount} of {currentPath.steps.length} milestones reached
-              </p>
+
+              <div className="w-full md:w-64 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shrink-0 shadow-sm">
+                <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1.5">
+                  <span>Roadmap Completion</span>
+                  <span className="font-bold text-slate-900 dark:text-slate-200">{pathProgressPercent}%</span>
+                </div>
+                <ProgressBar value={pathProgressPercent} color="bg-brand-500" height="md" />
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+                  {completedStepsCount} of {currentPath.steps.length} milestones reached
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Roadmap Steps */}
-          <div className="space-y-4">
-            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Milestone Roadmap</h3>
+            {/* Roadmap Steps */}
+            <div className="space-y-4">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Milestone Roadmap</h3>
 
-            <div className="space-y-3">
-              {currentPath.steps.map((step, idx) => {
-                const isLessonDone = step.lessonId && progress?.completedLessons?.[step.lessonId];
-                const isChallengeDone = step.challengeId && progress?.completedChallenges?.[step.challengeId];
-                const isDone = isLessonDone || isChallengeDone;
+              <div className="space-y-3">
+                {currentPath.steps.map((step, idx) => {
+                  const isLessonDone = step.lessonId && progress?.completedLessons?.[step.lessonId];
+                  const isChallengeDone = step.challengeId && progress?.completedChallenges?.[step.challengeId];
+                  const isDone = isLessonDone || isChallengeDone;
 
-                return (
-                  <Card
-                    key={step.id}
-                    className={`p-4 flex items-center justify-between transition ${
-                      isDone
-                        ? 'border-emerald-500/40 bg-emerald-50/30 dark:bg-emerald-950/10'
-                        : 'border-slate-200 dark:border-slate-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
-                          isDone
-                            ? 'bg-emerald-500 text-white'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                        }`}
-                      >
-                        {isDone ? <CheckCircle2 className="w-5 h-5" /> : idx + 1}
-                      </div>
-
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant={step.type === 'lesson' ? 'info' : step.type === 'challenge' ? 'purple' : 'warning'} size="sm">
-                            {step.type.toUpperCase()}
-                          </Badge>
-                          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">{step.durationMinutes} mins</span>
+                  return (
+                    <Card
+                      key={step.id}
+                      className={`p-4 flex items-center justify-between transition ${
+                        isDone
+                          ? 'border-emerald-500/40 bg-emerald-50/30 dark:bg-emerald-950/10'
+                          : 'border-slate-200 dark:border-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
+                            isDone
+                              ? 'bg-emerald-500 text-white'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                          }`}
+                        >
+                          {isDone ? <CheckCircle2 className="w-5 h-5" /> : idx + 1}
                         </div>
-                        <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">{step.title}</h4>
+
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant={step.type === 'lesson' ? 'info' : step.type === 'challenge' ? 'purple' : 'warning'} size="sm">
+                              {step.type.toUpperCase()}
+                            </Badge>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">{step.durationMinutes} mins</span>
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">{step.title}</h4>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      {step.lessonId && (
-                        <button
-                          onClick={() => setSelectedLessonId(step.lessonId || null)}
-                          className="px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
-                        >
-                          <BookOpen className="w-3.5 h-3.5" />
-                          <span>Study Lesson</span>
-                        </button>
-                      )}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {step.lessonId && (
+                          <button
+                            onClick={() => setSelectedLessonId(step.lessonId || null)}
+                            className="px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+                          >
+                            <BookOpen className="w-3.5 h-3.5" />
+                            <span>Study Lesson</span>
+                          </button>
+                        )}
 
-                      {step.challengeId && (
-                        <button
-                          onClick={() => setActiveNav('skills', { challengeId: step.challengeId })}
-                          className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
-                        >
-                          <Code2 className="w-3.5 h-3.5" />
-                          <span>Code Challenge</span>
-                        </button>
-                      )}
+                        {step.challengeId && (
+                          <button
+                            onClick={() => setActiveNav('skills', { challengeId: step.challengeId })}
+                            className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+                          >
+                            <Code2 className="w-3.5 h-3.5" />
+                            <span>Code Challenge</span>
+                          </button>
+                        )}
 
-                      {step.type === 'project' && (
-                        <button
-                          onClick={() => setActiveNav('projects')}
-                          className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
-                        >
-                          <FolderKanban className="w-3.5 h-3.5" />
-                          <span>Open Projects</span>
-                        </button>
-                      )}
+                        {step.type === 'project' && (
+                          <button
+                            onClick={() => setActiveNav('projects')}
+                            className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+                          >
+                            <FolderKanban className="w-3.5 h-3.5" />
+                            <span>Open Projects</span>
+                          </button>
+                        )}
 
-                      {step.type === 'practice' && (
-                        <button
-                          onClick={() => setActiveNav('practice')}
-                          className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
-                        >
-                          <FileQuestion className="w-3.5 h-3.5" />
-                          <span>Practice Quiz</span>
-                        </button>
-                      )}
-                    </div>
-                  </Card>
-                );
-              })}
+                        {step.type === 'practice' && (
+                          <button
+                            onClick={() => setActiveNav('practice')}
+                            className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+                          >
+                            <FileQuestion className="w-3.5 h-3.5" />
+                            <span>Practice Quiz</span>
+                          </button>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
+        )
       )}
     </div>
   );
