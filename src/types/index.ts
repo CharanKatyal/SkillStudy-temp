@@ -291,3 +291,40 @@ export interface UserProgressState {
     codingTimeMinutes: number;
   };
 }
+
+export type DayOfWeek = 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun';
+
+export type TimetableSlotType =
+  | 'school'
+  | 'study'
+  | 'coding'
+  | 'break'
+  | 'project'
+  | 'homework'
+  | 'revision'
+  | 'other';
+
+export interface TimetableSlot {
+  id: string;
+  day: DayOfWeek | 'Daily' | 'Weekdays' | 'Weekends';
+  startTime: string; // e.g. "16:00"
+  endTime: string;   // e.g. "17:00"
+  title: string;     // e.g. "Mathematics", "Python Coding", "Science Revision"
+  type: TimetableSlotType;
+  subjectOrSkillId?: string;
+  color: string;
+  notes?: string;
+}
+
+export interface StudentSchedule {
+  hasCustomTimetable: boolean;
+  schoolHours: {
+    enabled: boolean;
+    name: string;
+    days: DayOfWeek[];
+    startTime: string; // "08:00"
+    endTime: string;   // "14:30"
+  };
+  slots: TimetableSlot[];
+  lastUpdated: string;
+}

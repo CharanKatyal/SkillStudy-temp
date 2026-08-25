@@ -8,24 +8,38 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  Calendar
+  Calendar,
+  CalendarCheck,
+  School,
+  ArrowRight
 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
-import { PlannerTask } from '../../types';
+import { useApp } from '../../context/AppContext';
+import { PlannerTask, StudentSchedule } from '../../types';
 import { TaskModal } from './TaskModal';
-import { SmartTimetableModal } from '../ai/SmartTimetableModal';
+import { TimetableBuilder } from './TimetableBuilder';
+import { DEFAULT_STUDENT_SCHEDULE } from '../../data/defaultSchedules';
+import { scheduleService } from '../../services/scheduleService';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 
 export const PlannerView: React.FC = () => {
-  const { plannerTasks, togglePlannerTask, deletePlannerTask } = useData();
+  const {
+    plannerTasks,
+    togglePlannerTask,
+    deletePlannerTask,
+    savePlannerTask,
+    schedule,
+    updateSchedule
+  } = useData();
+  const { addToast } = useApp();
 
+  const [activeTab, setActiveTab] = useState<'tasks' | 'timetable'>('timetable');
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split('T')[0]
   );
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [isAiTimetableModalOpen, setIsAiTimetableModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<PlannerTask | null>(null);
 
   // Calculate current week days
@@ -69,228 +83,306 @@ export const PlannerView: React.FC = () => {
     setSelectedDate(d.toISOString().split('T')[0]);
   };
 
+  const handleSyncTimetableToTasks = async () => {
+    const activeSchedule = schedule || DEFAULT_STUDENT_SCHEDULE;
+    const targetDate = new Date(selectedDate);
+    const todaySlots = scheduleService.getTodaySlots(activeSchedule, targetDate);
+
+    if (todaySlots.length === 0) {
+      addToast('No Slots Today', 'No study blocks scheduled for this day.', 'info');
+      return;
+    }
+
+    let addedCount = 0;
+    for (const slot of todaySlots) {
+      if (slot.type === 'break') continue;
+
+      const alreadyExists = plannerTasks.some(
+        t => t.date === selectedDate && t.title === slot.title
+      );
+
+      if (!alreadyExists) {
+        const startM = scheduleService.timeToMinutes(slot.startTime);
+        const endM = scheduleService.timeToMinutes(slot.endTime);
+        const dur = endM > startM ? endM - startM : 60;
+
+        const newTask: PlannerTask = {
+          id: `task-sync-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+          title: slot.title,
+          date: selectedDate,
+          durationMinutes: dur,
+          priority: 'medium',
+          category: slot.type === 'coding' ? 'Coding' : slot.type === 'project' ? 'Project' : slot.type === 'revision' ? 'Revision' : 'Academic',
+          completed: false,
+          notes: slot.notes || `Scheduled ${scheduleService.minutesTo12Hour(startM)} – ${scheduleService.minutesTo12Hour(endM)}`
+        };
+
+        await savePlannerTask(newTask);
+        addedCount++;
+      }
+    }
+
+    if (addedCount > 0) {
+      addToast('Timetable Synced! ✅', `Added ${addedCount} study blocks to ${selectedDate} checklist.`, 'success');
+      setActiveTab('tasks');
+    } else {
+      addToast('Already Synced', "Today's timetable blocks are already on your checklist.", 'info');
+      setActiveTab('tasks');
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn">
-      {/* Header & View Switcher */}
+      {/* Top Header & Tab Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-750">
-            <button
-              onClick={() => setViewMode('day')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                viewMode === 'day'
-                  ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400'
-              }`}
-            >
-              Day View
-            </button>
-            <button
-              onClick={() => setViewMode('week')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                viewMode === 'week'
-                  ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400'
-              }`}
-            >
-              Week View
-            </button>
-          </div>
-
-          {/* Date Navigator */}
-          <div className="flex items-center gap-1 bg-white dark:bg-slate-850 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-750 text-xs text-slate-800 dark:text-slate-200 shadow-sm">
-            <button onClick={() => handleDateShift(-1)} className="p-1 hover:text-brand-600 dark:hover:text-white">
-              <ChevronLeft className="w-3.5 h-3.5" />
-            </button>
-            <span className="font-bold px-2">
-              {new Date(selectedDate).toLocaleDateString(undefined, {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-              })}
-            </span>
-            <button onClick={() => handleDateShift(1)} className="p-1 hover:text-brand-600 dark:hover:text-white">
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
+        <div>
+          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
+            Study Planner &amp; Routine
+          </h2>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            Build your personalized weekly schedule and track daily study checklist tasks.
+          </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Smart Timetable Generator */}
+        {/* Tab Switcher */}
+        <div className="flex items-center bg-slate-100 dark:bg-slate-850 rounded-xl p-1 border border-slate-200 dark:border-slate-750 shrink-0">
           <button
-            onClick={() => setIsAiTimetableModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-700/60 hover:bg-purple-100 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-200 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+            onClick={() => setActiveTab('timetable')}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+              activeTab === 'timetable'
+                ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-            <span>Smart Timetable</span>
+            <Clock className="w-4 h-4" />
+            <span>My Timetable &amp; Routine</span>
           </button>
-
           <button
-            onClick={handleOpenAdd}
-            className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition"
+            onClick={() => setActiveTab('tasks')}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+              activeTab === 'tasks'
+                ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            }`}
           >
-            <Plus className="w-4 h-4" />
-            <span>Add Task</span>
+            <CalendarCheck className="w-4 h-4" />
+            <span>Daily Checklist Tasks</span>
           </button>
         </div>
       </div>
 
-      {/* Week Day Pills (if week view) */}
-      {viewMode === 'week' && (
-        <div className="grid grid-cols-7 gap-2">
-          {weekDays.map(dStr => {
-            const d = new Date(dStr);
-            const isSelected = selectedDate === dStr;
-            const count = plannerTasks.filter(t => t.date === dStr).length;
+      {activeTab === 'timetable' ? (
+        /* Timetable Builder Mode */
+        <TimetableBuilder
+          schedule={schedule || DEFAULT_STUDENT_SCHEDULE}
+          onSaveSchedule={updateSchedule}
+          onSyncTasks={handleSyncTimetableToTasks}
+        />
+      ) : (
+        /* Daily / Weekly Checklist Tasks Mode */
+        <div className="space-y-6">
+          {/* Header & Date Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-slate-850 border border-slate-200 dark:border-slate-750 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-750">
+                <button
+                  onClick={() => setViewMode('day')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                    viewMode === 'day'
+                      ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  Day View
+                </button>
+                <button
+                  onClick={() => setViewMode('week')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                    viewMode === 'week'
+                      ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  Week View
+                </button>
+              </div>
 
-            return (
+              {/* Date Navigator */}
+              <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-200 shadow-sm">
+                <button onClick={() => handleDateShift(-1)} className="p-1 hover:text-brand-600 dark:hover:text-white">
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <span className="font-bold px-2">
+                  {new Date(selectedDate).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </span>
+                <button onClick={() => handleDateShift(1)} className="p-1 hover:text-brand-600 dark:hover:text-white">
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
               <button
-                key={dStr}
-                onClick={() => setSelectedDate(dStr)}
-                className={`p-2.5 rounded-xl border text-center transition ${
-                  isSelected
-                    ? 'bg-brand-50 dark:bg-brand-950/60 border-brand-500 text-brand-700 dark:text-brand-300 font-bold'
-                    : 'bg-white dark:bg-slate-850 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-                }`}
+                onClick={handleSyncTimetableToTasks}
+                className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-200 dark:border-slate-750 transition"
               >
-                <div className="text-[10px] uppercase font-bold">{d.toLocaleDateString(undefined, { weekday: 'short' })}</div>
-                <div className="text-sm font-bold text-slate-900 dark:text-slate-200 mt-0.5">{d.getDate()}</div>
-                {count > 0 && (
-                  <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-1">{count} tasks</div>
-                )}
+                <Clock className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+                <span>Sync Today's Routine</span>
               </button>
-            );
-          })}
+
+              <button
+                onClick={handleOpenAdd}
+                className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Task</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Metrics */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Card className="p-4 flex items-center justify-between">
+              <div>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Total Tasks</span>
+                <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{filteredTasks.length}</h4>
+              </div>
+              <Calendar className="w-6 h-6 text-brand-600 dark:text-brand-400" />
+            </Card>
+
+            <Card className="p-4 flex items-center justify-between">
+              <div>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Planned Time</span>
+                <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{Math.round(totalMinutes / 60 * 10) / 10} hrs</h4>
+              </div>
+              <Clock className="w-6 h-6 text-sky-500" />
+            </Card>
+
+            <Card className="p-4 flex items-center justify-between">
+              <div>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Completed</span>
+                <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{completedCount} / {filteredTasks.length}</h4>
+              </div>
+              <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+            </Card>
+          </div>
+
+          {/* Tasks List */}
+          {filteredTasks.length === 0 ? (
+            <Card className="text-center py-12 text-slate-500 dark:text-slate-400 text-sm">
+              <Calendar className="w-12 h-12 mx-auto text-slate-400 opacity-60 mb-2" />
+              <p>No study tasks scheduled for this date.</p>
+              <div className="flex items-center justify-center gap-3 mt-4">
+                <button
+                  onClick={handleSyncTimetableToTasks}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                >
+                  <Clock className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+                  <span>Sync from Timetable</span>
+                </button>
+                <button
+                  onClick={handleOpenAdd}
+                  className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-bold transition"
+                >
+                  Create Custom Task
+                </button>
+              </div>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {filteredTasks.map(task => (
+                <Card
+                  key={task.id}
+                  className={`p-4 flex items-center justify-between transition ${
+                    task.completed
+                      ? 'bg-slate-50/50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800/60 opacity-60'
+                      : 'border-slate-200 dark:border-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-3.5 flex-1 min-w-0 mr-4">
+                    <button
+                      onClick={() => togglePlannerTask(task.id)}
+                      className={`w-6 h-6 rounded-lg flex items-center justify-center transition border ${
+                        task.completed
+                          ? 'bg-emerald-500 border-emerald-500 text-white'
+                          : 'border-slate-300 dark:border-slate-700 hover:border-brand-500'
+                      }`}
+                    >
+                      {task.completed && <CheckCircle2 className="w-4 h-4" />}
+                    </button>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h4
+                          className={`text-sm font-bold truncate ${
+                            task.completed
+                              ? 'line-through text-slate-500 dark:text-slate-500'
+                              : 'text-slate-900 dark:text-slate-100'
+                          }`}
+                        >
+                          {task.title}
+                        </h4>
+                        <Badge
+                          variant={task.priority === 'high' ? 'danger' : task.priority === 'medium' ? 'warning' : 'info'}
+                          size="sm"
+                        >
+                          {task.priority}
+                        </Badge>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5" />
+                          {task.durationMinutes}m
+                        </span>
+                        <span>•</span>
+                        <span>{task.category}</span>
+                        {task.notes && (
+                          <>
+                            <span>•</span>
+                            <span className="italic truncate">{task.notes}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => handleOpenEdit(task)}
+                      className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                      title="Edit Task"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => deletePlannerTask(task.id)}
+                      className="p-2 text-slate-400 hover:text-rose-500 transition"
+                      title="Delete Task"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Overview Stats Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="p-4 flex items-center justify-between">
-          <div>
-            <span className="text-xs text-slate-500 dark:text-slate-400">Total Planned Tasks</span>
-            <div className="text-xl font-extrabold text-slate-900 dark:text-slate-100">{filteredTasks.length}</div>
-          </div>
-          <Calendar className="w-6 h-6 text-brand-600 dark:text-brand-400" />
-        </Card>
-
-        <Card className="p-4 flex items-center justify-between">
-          <div>
-            <span className="text-xs text-slate-500 dark:text-slate-400">Completed Tasks</span>
-            <div className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">
-              {completedCount} / {filteredTasks.length}
-            </div>
-          </div>
-          <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-        </Card>
-
-        <Card className="p-4 flex items-center justify-between">
-          <div>
-            <span className="text-xs text-slate-500 dark:text-slate-400">Planned Study Time</span>
-            <div className="text-xl font-extrabold text-purple-600 dark:text-purple-400">
-              {totalMinutes} mins
-            </div>
-          </div>
-          <Clock className="w-6 h-6 text-purple-500" />
-        </Card>
-      </div>
-
-      {/* Task List */}
-      <div className="space-y-3">
-        <h3 className="text-base font-bold text-slate-900 dark:text-slate-200">
-          Scheduled Tasks for {viewMode === 'day' ? 'Today' : 'This Week'}
-        </h3>
-
-        {filteredTasks.length === 0 ? (
-          <Card className="text-center py-12 text-slate-500 dark:text-slate-400 text-sm">
-            <Calendar className="w-10 h-10 mx-auto mb-2 text-slate-400" />
-            <p>No study tasks scheduled for this date.</p>
-            <button
-              onClick={handleOpenAdd}
-              className="mt-3 px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-bold"
-            >
-              Add Your First Task
-            </button>
-          </Card>
-        ) : (
-          <div className="space-y-2.5">
-            {filteredTasks.map(task => (
-              <Card
-                key={task.id}
-                className={`p-4 flex items-center justify-between gap-4 transition ${
-                  task.completed ? 'opacity-70' : ''
-                }`}
-              >
-                <div className="flex items-center gap-3 flex-1 truncate">
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={() => togglePlannerTask(task.id)}
-                    className="w-5 h-5 rounded accent-brand-600 cursor-pointer"
-                  />
-                  <div className="truncate">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <Badge
-                        variant={
-                          task.priority === 'high'
-                            ? 'danger'
-                            : task.priority === 'medium'
-                            ? 'warning'
-                            : 'info'
-                        }
-                        size="sm"
-                      >
-                        {task.priority}
-                      </Badge>
-                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">{task.category}</span>
-                      <span className="text-[11px] text-slate-400">•</span>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {task.durationMinutes}m
-                      </span>
-                    </div>
-                    <h4
-                      className={`text-sm font-bold truncate ${
-                        task.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
-                      }`}
-                    >
-                      {task.title}
-                    </h4>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={() => handleOpenEdit(task)}
-                    className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-                    title="Edit Task"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => deletePlannerTask(task.id)}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-                    title="Delete Task"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-
+      {/* Task Modal */}
       <TaskModal
         isOpen={isTaskModalOpen}
-        onClose={() => setIsTaskModalOpen(false)}
+        onClose={() => {
+          setIsTaskModalOpen(false);
+          setTaskToEdit(null);
+        }}
         taskToEdit={taskToEdit}
         defaultDate={selectedDate}
-      />
-
-      <SmartTimetableModal
-        isOpen={isAiTimetableModalOpen}
-        onClose={() => setIsAiTimetableModalOpen(false)}
       />
     </div>
   );

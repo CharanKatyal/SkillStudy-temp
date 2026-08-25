@@ -8,10 +8,12 @@ import {
   PlannerTask,
   PortfolioData,
   Achievement,
-  PracticeAttempt
+  PracticeAttempt,
+  StudentSchedule
 } from '../types';
 import { INITIAL_ACHIEVEMENTS } from '../data/defaultAchievements';
 import { PROJECT_TEMPLATES } from '../data/projectTemplates';
+import { DEFAULT_STUDENT_SCHEDULE } from '../data/defaultSchedules';
 
 const DEFAULT_SETTINGS: UserSettings = {
   theme: 'dark',
@@ -377,6 +379,25 @@ export class StorageService {
       }
     };
     await this.saveProgress(updated);
+  }
+
+  // --- Student Timetable Schedule ---
+  async getSchedule(): Promise<StudentSchedule> {
+    try {
+      const data = await db.get<StudentSchedule>(STORES.SCHEDULE, 'student_schedule');
+      if (data) return data;
+    } catch {}
+
+    // Fallback or default
+    return DEFAULT_STUDENT_SCHEDULE;
+  }
+
+  async saveSchedule(schedule: StudentSchedule): Promise<void> {
+    try {
+      await db.put(STORES.SCHEDULE, schedule, 'student_schedule');
+    } catch {
+      localStorage.setItem('skudium_schedule', JSON.stringify(schedule));
+    }
   }
 
   // --- Reset All Data ---

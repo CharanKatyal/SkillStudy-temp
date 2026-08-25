@@ -4,7 +4,7 @@
  */
 
 const DB_NAME = 'Skudium_DB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export const STORES = {
   PROFILE: 'profile',
@@ -16,6 +16,7 @@ export const STORES = {
   PORTFOLIO: 'portfolio',
   ACHIEVEMENTS: 'achievements',
   PRACTICE_ATTEMPTS: 'practice_attempts',
+  SCHEDULE: 'schedule',
 } as const;
 
 class IndexedDBClient {
@@ -46,6 +47,9 @@ class IndexedDBClient {
         }
         if (!db.objectStoreNames.contains(STORES.PORTFOLIO)) {
           db.createObjectStore(STORES.PORTFOLIO, { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains(STORES.SCHEDULE)) {
+          db.createObjectStore(STORES.SCHEDULE, { keyPath: 'id' });
         }
 
         // Multi-record stores

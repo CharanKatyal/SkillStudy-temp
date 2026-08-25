@@ -8,10 +8,13 @@ import {
   PlannerTask,
   PortfolioData,
   Achievement,
-  PracticeAttempt
+  PracticeAttempt,
+  StudentSchedule
 } from '../types';
 import { storageService } from '../services/storageService';
 import { achievementEngine } from '../services/achievementEngine';
+import { scheduleService, ScheduleStatus } from '../services/scheduleService';
+import { DEFAULT_STUDENT_SCHEDULE } from '../data/defaultSchedules';
 import { useApp } from './AppContext';
 
 interface DataContextType {
@@ -19,6 +22,8 @@ interface DataContextType {
   profile: UserProfile | null;
   settings: UserSettings | null;
   progress: UserProgressState | null;
+  schedule: StudentSchedule | null;
+  scheduleStatus: ScheduleStatus;
   ideProjects: IdeProject[];
   managedProjects: ManagedProject[];
   plannerTasks: PlannerTask[];
@@ -28,6 +33,7 @@ interface DataContextType {
   refreshData: () => Promise<void>;
   updateProfile: (profile: UserProfile) => Promise<void>;
   updateSettings: (settings: UserSettings) => Promise<void>;
+  updateSchedule: (schedule: StudentSchedule) => Promise<void>;
   markLessonComplete: (lessonId: string) => Promise<void>;
   markChallengeComplete: (challengeId: string, code?: string) => Promise<void>;
   saveLessonNote: (lessonId: string, notes: string) => Promise<void>;
@@ -51,12 +57,24 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [progress, setProgress] = useState<UserProgressState | null>(null);
+  const [schedule, setSchedule] = useState<StudentSchedule | null>(null);
   const [ideProjects, setIdeProjects] = useState<IdeProject[]>([]);
   const [managedProjects, setManagedProjects] = useState<ManagedProject[]>([]);
   const [plannerTasks, setPlannerTasks] = useState<PlannerTask[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [practiceAttempts, setPracticeAttempts] = useState<PracticeAttempt[]>([]);
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
+  // Real-time clock ticker
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 15000); // refresh every 15s
+    return () => clearInterval(timer);
+  }, []);
+
+  const scheduleStatus = scheduleService.getCurrentStatus(schedule || DEFAULT_STUDENT_SCHEDULE, currentTime);
 
   const checkAchievements = useCallback(async () => {
     const newlyUnlocked = await achievementEngine.evaluateAchievements();
@@ -72,13 +90,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshData = useCallback(async () => {
     try {
       // 1. Load profile and settings first
-      const [p, s] = await Promise.all([
+      const [p, s, sched] = await Promise.all([
         storageService.getProfile(),
-        storageService.getSettings()
+        storageService.getSettings(),
+        storageService.getSchedule()
       ]);
 
       setProfile(p);
       setSettings(s);
+      setSchedule(sched);
 
       // Immediately sync DOM theme
       const root = document.documentElement;
@@ -173,6 +193,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     await storageService.saveSettings(newSettings);
     setSettings(newSettings);
+  };
+
+  const updateSchedule = async (newSchedule: StudentSchedule) => {
+    await storageService.saveSchedule(newSchedule);
+    setSchedule(newSchedule);
+    addToast('Timetable Updated ⏰', 'Your daily schedule has been synchronized.', 'success');
   };
 
   const markLessonComplete = async (lessonId: string) => {
@@ -279,6 +305,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         profile,
         settings,
         progress,
+        schedule,
+        scheduleStatus,
         ideProjects,
         managedProjects,
         plannerTasks,
@@ -288,6 +316,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         refreshData,
         updateProfile,
         updateSettings,
+        updateSchedule,
         markLessonComplete,
         markChallengeComplete,
         saveLessonNote,

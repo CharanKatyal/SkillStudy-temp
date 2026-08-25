@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { useData } from '../../context/DataContext';
 import { getAvatarDisplay } from '../../data/defaultAvatars';
 import { Modal } from '../common/Modal';
+import { TodayTimetableModal } from './TodayTimetableModal';
 
 interface HeaderProps {
   onToggleMobileMenu: () => void;
@@ -11,8 +12,9 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   const { activeNav, setActiveNav } = useApp();
-  const { profile, progress, settings, updateSettings } = useData();
+  const { profile, progress, settings, updateSettings, scheduleStatus } = useData();
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+  const [isTodayScheduleOpen, setIsTodayScheduleOpen] = useState(false);
 
   const titles: Record<string, { title: string; subtitle: string }> = {
     dashboard: { title: 'Dashboard', subtitle: 'Overview of your learning progress and projects' },
@@ -80,6 +82,37 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Real-time Schedule & Timetable Status Pill */}
+          <button
+            onClick={() => setIsTodayScheduleOpen(true)}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold transition shadow-sm ${
+              scheduleStatus.isSchoolTime
+                ? 'bg-sky-50 dark:bg-sky-950/60 border-sky-300 dark:border-sky-800 text-sky-700 dark:text-sky-300 hover:border-sky-400'
+                : scheduleStatus.statusType === 'break'
+                ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:border-emerald-400'
+                : scheduleStatus.activeSlot
+                ? 'bg-brand-50 dark:bg-brand-950/60 border-brand-300 dark:border-brand-800 text-brand-700 dark:text-brand-300 hover:border-brand-400'
+                : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+            }`}
+            title="Click to view today's complete schedule"
+          >
+            <span className={`w-2 h-2 rounded-full shrink-0 ${
+              scheduleStatus.isSchoolTime
+                ? 'bg-sky-500 animate-pulse'
+                : scheduleStatus.activeSlot
+                ? 'bg-brand-500 animate-pulse'
+                : 'bg-slate-400'
+            }`} />
+            <span className="truncate max-w-[130px] sm:max-w-[190px]">
+              {scheduleStatus.isSchoolTime ? '🏫 School Hours' : scheduleStatus.title}
+            </span>
+            {scheduleStatus.formattedRemainingTime && (
+              <span className="hidden md:inline text-[11px] opacity-80 font-normal">
+                ({scheduleStatus.formattedRemainingTime})
+              </span>
+            )}
+          </button>
+
           {/* Streak Counter */}
           <div
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-300 text-xs font-semibold"
@@ -141,6 +174,12 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           </button>
         </div>
       </header>
+
+      {/* Today's Timetable Modal */}
+      <TodayTimetableModal
+        isOpen={isTodayScheduleOpen}
+        onClose={() => setIsTodayScheduleOpen(false)}
+      />
 
       {/* Exit / Power Off Modal (if browser prevents script auto-close) */}
       <Modal
