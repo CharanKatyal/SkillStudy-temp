@@ -76,13 +76,13 @@ export class ScheduleService {
     const nowMinutes = currentHour * 60 + currentMin;
     const currentTimeStr = `${currentHour.toString().padStart(2, '0')}:${currentMin.toString().padStart(2, '0')}`;
 
-    if (!schedule) {
+    if (!schedule || schedule.mode === 'open') {
       return {
         currentDay,
         currentTimeStr,
         statusType: 'free',
-        title: 'Free Exploration',
-        subtitle: 'Self-paced learning & coding',
+        title: 'Full Open Mode',
+        subtitle: 'Self-paced learning (No timetable)',
         activeSlot: null,
         nextSlot: null,
         isSchoolTime: false,

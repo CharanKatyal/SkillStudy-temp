@@ -17,18 +17,18 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   const [isTodayScheduleOpen, setIsTodayScheduleOpen] = useState(false);
 
   const titles: Record<string, { title: string; subtitle: string }> = {
-    dashboard: { title: 'Dashboard', subtitle: 'Overview of your learning progress and projects' },
-    academics: { title: 'Academics & Learning', subtitle: 'Structured subject curricula, master roadmaps, and lesson readers' },
-    skills: { title: 'Practical Skills', subtitle: 'Modern web development, programming, tools, and UI/UX design' },
-    practice: { title: 'Practice Hub', subtitle: 'Quizzes, conceptual assessments, and coding challenges' },
-    ide: { title: 'Code Studio', subtitle: 'Multi-language editor with live browser runtime & console' },
-    projects: { title: 'Projects', subtitle: 'Milestone management, task checklists, and workspace links' },
-    planner: { title: 'Study Planner', subtitle: 'Interactive timetable and scheduled study tasks' },
-    achievements: { title: 'Achievements & Portfolio', subtitle: 'Unlock badges, track honors, and view student transcript' },
-    settings: { title: 'Settings', subtitle: 'Profile preferences, avatar, and local data backup' }
+    dashboard: { title: 'Dashboard', subtitle: 'Overview of your learning and schedule' },
+    academics: { title: 'Academics', subtitle: 'Curriculum subjects and learning roadmaps' },
+    skills: { title: 'Skills', subtitle: 'Programming and development tracks' },
+    practice: { title: 'Practice Hub', subtitle: 'Quizzes and assessments' },
+    ide: { title: 'Code Studio', subtitle: 'Offline code editor and live preview' },
+    projects: { title: 'Projects', subtitle: 'Milestones and tasks' },
+    planner: { title: 'Study Planner', subtitle: 'Timetable and daily tasks' },
+    achievements: { title: 'Achievements', subtitle: 'Badges and portfolio transcript' },
+    settings: { title: 'Settings', subtitle: 'Profile and preferences' }
   };
 
-  const currentInfo = titles[activeNav] || { title: 'Skudium', subtitle: 'Student Learning & Code Platform' };
+  const currentInfo = titles[activeNav] || { title: 'Skudium', subtitle: 'Student Workspace' };
 
   const avatarInfo = getAvatarDisplay(profile?.avatarUrl, profile?.displayName);
 

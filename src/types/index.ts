@@ -316,7 +316,10 @@ export interface TimetableSlot {
   notes?: string;
 }
 
+export type TimetableMode = 'structured' | 'open';
+
 export interface StudentSchedule {
+  mode?: TimetableMode; // 'structured' | 'open' (default: 'structured')
   hasCustomTimetable: boolean;
   schoolHours: {
     enabled: boolean;

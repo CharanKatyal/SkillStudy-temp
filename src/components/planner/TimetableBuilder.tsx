@@ -13,11 +13,10 @@ import {
   School,
   CalendarCheck,
   CheckCircle2,
-  Layers,
-  Wand2
+  Layers
 } from 'lucide-react';
 import { StudentSchedule, TimetableSlot, DayOfWeek, TimetableSlotType } from '../../types';
-import { TIMETABLE_PRESETS, DEFAULT_STUDENT_SCHEDULE } from '../../data/defaultSchedules';
+import { DEFAULT_STUDENT_SCHEDULE } from '../../data/defaultSchedules';
 import { TimetableSlotModal } from './TimetableSlotModal';
 import { scheduleService } from '../../services/scheduleService';
 import { Card } from '../common/Card';
@@ -45,6 +44,16 @@ export const TimetableBuilder: React.FC<TimetableBuilderProps> = ({
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
   const [slotToEdit, setSlotToEdit] = useState<TimetableSlot | null>(null);
 
+  const handleModeChange = (mode: 'structured' | 'open') => {
+    const updated: StudentSchedule = {
+      ...localSchedule,
+      mode,
+      lastUpdated: new Date().toISOString()
+    };
+    setLocalSchedule(updated);
+    onSaveSchedule(updated);
+  };
+
   const handleUpdateSchoolHours = (
     key: keyof StudentSchedule['schoolHours'],
     val: any
@@ -68,20 +77,6 @@ export const TimetableBuilder: React.FC<TimetableBuilderProps> = ({
       : [...currentDays, day];
 
     handleUpdateSchoolHours('days', nextDays);
-  };
-
-  const handleApplyPreset = (presetId: string) => {
-    const preset = TIMETABLE_PRESETS.find(p => p.id === presetId);
-    if (!preset) return;
-
-    const updated: StudentSchedule = {
-      hasCustomTimetable: true,
-      schoolHours: preset.schoolHours,
-      slots: preset.slots,
-      lastUpdated: new Date().toISOString()
-    };
-    setLocalSchedule(updated);
-    onSaveSchedule(updated);
   };
 
   const handleSaveSlot = (slot: TimetableSlot) => {
@@ -132,60 +127,77 @@ export const TimetableBuilder: React.FC<TimetableBuilderProps> = ({
     (a, b) => scheduleService.timeToMinutes(a.startTime) - scheduleService.timeToMinutes(b.startTime)
   );
 
+  const isFullOpen = localSchedule.mode === 'open';
+
   return (
     <div className="space-y-6">
-      {/* 1. Quick Presets Card */}
-      <Card className="p-6 bg-gradient-to-r from-brand-50/60 via-white to-white dark:from-slate-850 dark:via-slate-850 dark:to-slate-900">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center">
-              <Wand2 className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                Choose a Routine Template
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Pick a routine to jumpstart your daily timetable, or customize every block manually.
-              </p>
-            </div>
-          </div>
+      {/* Mode Switcher */}
+      <Card className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <Clock className="w-4 h-4 text-brand-600 dark:text-brand-400" />
+            <span>Timetable Mode</span>
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Choose whether to follow a structured timetable or learn freely without schedules.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-          {TIMETABLE_PRESETS.map(preset => (
-            <div
-              key={preset.id}
-              onClick={() => handleApplyPreset(preset.id)}
-              className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-brand-500 hover:shadow-md cursor-pointer transition flex flex-col justify-between group"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Badge variant="info">{preset.badge}</Badge>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
-                    {preset.slots.length} Blocks
-                  </span>
-                </div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition">
-                  {preset.name}
-                </h4>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  {preset.description}
-                </p>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-brand-600 dark:text-brand-400 font-bold">
-                <span>Apply Template</span>
-                <span>&rarr;</span>
-              </div>
-            </div>
-          ))}
+        <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-750 shrink-0">
+          <button
+            type="button"
+            onClick={() => handleModeChange('structured')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+              !isFullOpen
+                ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            }`}
+          >
+            <Clock className="w-3.5 h-3.5" />
+            <span>Structured Timetable</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleModeChange('open')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+              isFullOpen
+                ? 'bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Full Open (No Timetable)</span>
+          </button>
         </div>
       </Card>
 
-      {/* 2. School Hours Configuration */}
-      <Card className="p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      {isFullOpen ? (
+        /* Full Open Mode State */
+        <Card className="p-8 text-center space-y-3 bg-gradient-to-r from-brand-50/40 via-white to-amber-50/40 dark:from-slate-850 dark:via-slate-850 dark:to-slate-900 border-dashed">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center">
+            <Sparkles className="w-6 h-6" />
+          </div>
+          <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">
+            Full Open Mode Active
+          </h4>
+          <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+            You have complete freedom to study subjects, take quizzes, and build code projects anytime at your own pace without scheduled time blocks or school countdowns.
+          </p>
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => handleModeChange('structured')}
+              className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold transition shadow-sm"
+            >
+              Switch to Structured Timetable
+            </button>
+          </div>
+        </Card>
+      ) : (
+        <>
+          {/* 1. School Hours Configuration */}
+          <Card className="p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center">
               <School className="w-5 h-5" />
@@ -445,6 +457,8 @@ export const TimetableBuilder: React.FC<TimetableBuilderProps> = ({
           </div>
         )}
       </Card>
+      </>
+      )}
 
       {/* Modal */}
       <TimetableSlotModal

@@ -75,6 +75,7 @@ export const DEFAULT_SCHEDULE_SLOTS: TimetableSlot[] = [
 ];
 
 export const DEFAULT_STUDENT_SCHEDULE: StudentSchedule = {
+  mode: 'structured',
   hasCustomTimetable: true,
   schoolHours: {
     enabled: true,

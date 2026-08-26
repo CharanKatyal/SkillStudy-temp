@@ -156,7 +156,13 @@ export const TodayTimetableModal: React.FC<TodayTimetableModalProps> = ({
           )}
 
           {/* Study / Activity Slots */}
-          {todaySlots.length === 0 ? (
+          {schedule?.mode === 'open' ? (
+            <div className="text-center py-8 space-y-2 text-slate-500 dark:text-slate-400 text-xs">
+              <Sparkles className="w-8 h-8 mx-auto text-amber-500 opacity-80" />
+              <p className="font-bold text-slate-800 dark:text-slate-200">Full Open Learning Active</p>
+              <p className="text-[11px] max-w-xs mx-auto">No timetable constraints are set. You can study, code, and take practice assessments anytime.</p>
+            </div>
+          ) : todaySlots.length === 0 ? (
             <div className="text-center py-6 text-slate-500 dark:text-slate-400 text-xs">
               <p>No study blocks configured for today.</p>
             </div>

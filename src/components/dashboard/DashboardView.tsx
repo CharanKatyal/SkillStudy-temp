@@ -186,7 +186,12 @@ export const DashboardView: React.FC = () => {
           )}
 
           {/* Slots */}
-          {scheduleStatus.todaySlots.length === 0 ? (
+          {schedule?.mode === 'open' ? (
+            <span className="text-xs text-slate-500 dark:text-slate-400 py-2 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Full Open Mode active — Learn and code at your own pace without schedule limits.</span>
+            </span>
+          ) : scheduleStatus.todaySlots.length === 0 ? (
             <span className="text-xs text-slate-500 dark:text-slate-400 py-2">
               No after-school blocks scheduled for today.
             </span>

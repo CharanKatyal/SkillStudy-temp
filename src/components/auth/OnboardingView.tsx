@@ -5,13 +5,15 @@ import {
   Sparkles,
   ArrowLeft,
   ArrowRight,
-  ShieldCheck,
   AlertCircle,
   Power,
   Clock,
   School,
   CheckCircle2,
-  Calendar
+  Calendar,
+  Moon,
+  Sun,
+  Laptop
 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import { useApp } from '../../context/AppContext';
@@ -22,13 +24,14 @@ import { TimetableBuilder } from '../planner/TimetableBuilder';
 import { DEFAULT_STUDENT_SCHEDULE } from '../../data/defaultSchedules';
 
 export const OnboardingView: React.FC = () => {
-  const { updateProfile, updateSchedule, refreshData } = useData();
+  const { updateProfile, updateSchedule, updateSettings, settings, refreshData } = useData();
   const { addToast } = useApp();
 
   const [step, setStep] = useState<'welcome' | 'profile' | 'timetable'>('welcome');
   const [displayName, setDisplayName] = useState('');
   const [gradeLevel, setGradeLevel] = useState('10th Grade');
   const [avatarUrl, setAvatarUrl] = useState('avatar-scholar');
+  const [selectedTheme, setSelectedTheme] = useState<'dark' | 'light' | 'system'>(settings?.theme || 'dark');
   const [schedule, setSchedule] = useState<StudentSchedule>(DEFAULT_STUDENT_SCHEDULE);
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
@@ -89,10 +92,57 @@ export const OnboardingView: React.FC = () => {
     }
   };
 
+  const handleThemeChange = (theme: 'dark' | 'light' | 'system') => {
+    setSelectedTheme(theme);
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else if (theme === 'light') {
+      root.classList.remove('dark');
+    } else {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (isDark) root.classList.add('dark');
+      else root.classList.remove('dark');
+    }
+
+    const currentSettings = settings || {
+      theme,
+      editor: { fontSize: 14, tabSize: 2, lineNumbers: true, wordWrap: true },
+      accessibility: { highContrast: false, reducedMotion: false, dyslexicFont: false }
+    };
+
+    updateSettings({ ...currentSettings, theme });
+  };
+
   const handleProfileNext = (e: React.FormEvent) => {
     e.preventDefault();
     if (!displayName.trim()) return;
     setStep('timetable');
+  };
+
+  const handleLaunchOpenMode = async () => {
+    if (!displayName.trim()) return;
+
+    const newProfile: UserProfile = {
+      displayName: displayName.trim(),
+      gradeLevel: gradeLevel.trim(),
+      bio: '',
+      avatarIcon: 'GraduationCap',
+      avatarUrl: avatarUrl,
+      joinedAt: new Date().toISOString()
+    };
+
+    const openSchedule: StudentSchedule = {
+      ...schedule,
+      mode: 'open',
+      hasCustomTimetable: false,
+      lastUpdated: new Date().toISOString()
+    };
+
+    await updateSchedule(openSchedule);
+    await updateProfile(newProfile);
+
+    addToast(`Welcome to Skudium, ${newProfile.displayName}! 🚀`, 'Full Open (Free Learning) mode is active.', 'success');
   };
 
   const handleFinishOnboarding = async () => {
@@ -155,10 +205,10 @@ export const OnboardingView: React.FC = () => {
             <div className="space-y-6">
               <div className="text-center space-y-1.5">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                  Get Started with Skudium
+                  Welcome to Skudium
                 </h2>
                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-sm mx-auto">
-                  Build your personalized daily timetable, master subjects, code in IDE Studio, and manage your school routine 100% offline.
+                  Create your profile to get started or restore existing data.
                 </p>
               </div>
 
@@ -205,11 +255,6 @@ export const OnboardingView: React.FC = () => {
                   <span>{isImporting ? 'Restoring Data...' : 'Import from JSON Backup'}</span>
                 </button>
               </div>
-
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Zero Server Tracking • 100% Offline Local Storage</span>
-              </div>
             </div>
           ) : (
             /* Step 1: Profile & Avatar Setup */
@@ -233,7 +278,7 @@ export const OnboardingView: React.FC = () => {
                   Student Profile Setup
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Enter your name and choose your student avatar.
+                  Enter your name, grade, avatar, and preferred theme.
                 </p>
               </div>
 
@@ -278,14 +323,73 @@ export const OnboardingView: React.FC = () => {
                 </select>
               </div>
 
-              <button
-                type="submit"
-                disabled={!displayName.trim()}
-                className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-brand-600 hover:from-emerald-600 hover:to-brand-700 disabled:opacity-50 text-white text-sm font-bold shadow-lg shadow-emerald-500/20 hover:shadow-xl transition flex items-center justify-center gap-2 group mt-2"
-              >
-                <span>Continue to Timetable Setup</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
-              </button>
+              {/* Theme Preference */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Theme Preference
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleThemeChange('dark')}
+                    className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-1.5 text-xs font-bold transition ${
+                      selectedTheme === 'dark'
+                        ? 'bg-emerald-50 dark:bg-slate-800 border-emerald-500 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500 shadow-sm'
+                        : 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                  >
+                    <Moon className="w-3.5 h-3.5" />
+                    <span>Dark</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleThemeChange('light')}
+                    className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-1.5 text-xs font-bold transition ${
+                      selectedTheme === 'light'
+                        ? 'bg-emerald-50 dark:bg-slate-800 border-emerald-500 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500 shadow-sm'
+                        : 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                  >
+                    <Sun className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Light</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleThemeChange('system')}
+                    className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-1.5 text-xs font-bold transition ${
+                      selectedTheme === 'system'
+                        ? 'bg-emerald-50 dark:bg-slate-800 border-emerald-500 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500 shadow-sm'
+                        : 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    }`}
+                  >
+                    <Laptop className="w-3.5 h-3.5" />
+                    <span>System</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-2">
+                <button
+                  type="submit"
+                  disabled={!displayName.trim()}
+                  className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-brand-600 hover:from-emerald-600 hover:to-brand-700 disabled:opacity-50 text-white text-sm font-bold shadow-lg shadow-emerald-500/20 hover:shadow-xl transition flex items-center justify-center gap-2 group"
+                >
+                  <span>Continue to Timetable Setup</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleLaunchOpenMode}
+                  disabled={!displayName.trim()}
+                  className="w-full py-2.5 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-850 disabled:opacity-50 text-slate-700 dark:text-slate-300 text-xs font-bold transition flex items-center justify-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Start with Full Open Mode (No Timetable)</span>
+                </button>
+              </div>
             </form>
           )}
         </div>
