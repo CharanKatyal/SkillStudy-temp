@@ -24,6 +24,139 @@ interface LessonViewerProps {
   onBack: () => void;
 }
 
+const renderInlineFormatting = (text: string) => {
+  const parts = text.split(/(\*\*.*?\*\*|`.*?`|\*.*?\*)/g);
+
+  return parts.map((seg, i) => {
+    if (seg.startsWith('**') && seg.endsWith('**')) {
+      return (
+        <strong key={i} className="font-bold text-slate-900 dark:text-slate-100">
+          {seg.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (seg.startsWith('`') && seg.endsWith('`')) {
+      return (
+        <code
+          key={i}
+          className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400 font-mono text-xs font-semibold border border-slate-200 dark:border-slate-700"
+        >
+          {seg.slice(1, -1)}
+        </code>
+      );
+    }
+    if (seg.startsWith('*') && seg.endsWith('*')) {
+      return (
+        <em key={i} className="italic text-slate-800 dark:text-slate-200">
+          {seg.slice(1, -1)}
+        </em>
+      );
+    }
+    return seg;
+  });
+};
+
+const renderFormattedContent = (content: string) => {
+  if (!content) return null;
+
+  const parts = content.split(/(```[\s\S]*?```)/g);
+
+  return parts.map((part, partIdx) => {
+    if (part.startsWith('```')) {
+      const lines = part.slice(3, -3).trim().split('\n');
+      const lang = lines[0]?.match(/^[a-z0-9_-]+$/i) ? lines[0] : '';
+      const code = lang ? lines.slice(1).join('\n') : lines.join('\n');
+
+      return (
+        <div
+          key={partIdx}
+          className="my-4 rounded-xl overflow-hidden border border-slate-750 bg-slate-950 text-emerald-300 font-mono text-xs shadow-md"
+        >
+          {lang && (
+            <div className="px-4 py-1.5 bg-slate-900 border-b border-slate-800 text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+              {lang}
+            </div>
+          )}
+          <pre className="p-4 overflow-x-auto">
+            <code>{code}</code>
+          </pre>
+        </div>
+      );
+    }
+
+    const lines = part.split('\n');
+    const elements: React.ReactNode[] = [];
+    let currentList: string[] = [];
+
+    const flushList = () => {
+      if (currentList.length > 0) {
+        elements.push(
+          <ul key={`list-${elements.length}`} className="my-3 space-y-1.5 pl-2">
+            {currentList.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300">
+                <span className="text-brand-500 font-bold mt-0.5">•</span>
+                <span>{renderInlineFormatting(item)}</span>
+              </li>
+            ))}
+          </ul>
+        );
+        currentList = [];
+      }
+    };
+
+    lines.forEach((line, lineIdx) => {
+      const trimmed = line.trim();
+
+      if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        currentList.push(trimmed.slice(2));
+        return;
+      }
+
+      flushList();
+
+      if (trimmed.startsWith('### ')) {
+        elements.push(
+          <h3
+            key={lineIdx}
+            className="text-lg font-extrabold text-slate-900 dark:text-slate-100 mt-6 mb-2 border-b border-slate-200 dark:border-slate-800 pb-1.5"
+          >
+            {trimmed.slice(4)}
+          </h3>
+        );
+      } else if (trimmed.startsWith('#### ')) {
+        elements.push(
+          <h4
+            key={lineIdx}
+            className="text-base font-bold text-slate-900 dark:text-slate-100 mt-4 mb-1.5"
+          >
+            {trimmed.slice(5)}
+          </h4>
+        );
+      } else if (trimmed.startsWith('> ')) {
+        elements.push(
+          <blockquote
+            key={lineIdx}
+            className="my-3 p-4 rounded-xl bg-brand-50/70 dark:bg-brand-950/40 border-l-4 border-brand-500 text-slate-800 dark:text-slate-200 italic text-sm leading-relaxed shadow-sm"
+          >
+            {renderInlineFormatting(trimmed.slice(2))}
+          </blockquote>
+        );
+      } else if (trimmed === '---') {
+        elements.push(<hr key={lineIdx} className="my-6 border-slate-200 dark:border-slate-800" />);
+      } else if (trimmed.length > 0) {
+        elements.push(
+          <p key={lineIdx} className="my-2 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+            {renderInlineFormatting(trimmed)}
+          </p>
+        );
+      }
+    });
+
+    flushList();
+    return <div key={partIdx}>{elements}</div>;
+  });
+};
+
 export const LessonViewer: React.FC<LessonViewerProps> = ({ lesson, allLessons, onBack }) => {
   const { openInIdeWithCode, setActiveNav } = useApp();
   const { progress, markLessonComplete, saveLessonNote } = useData();
@@ -114,8 +247,8 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({ lesson, allLessons, 
 
       {/* Main Content Area */}
       <Card className="p-6 sm:p-8 space-y-6 leading-relaxed text-sm text-slate-800 dark:text-slate-200">
-        <div className="whitespace-pre-line font-sans space-y-4 text-slate-800 dark:text-slate-200">
-          {lesson.content}
+        <div className="font-sans space-y-3 text-slate-800 dark:text-slate-200">
+          {renderFormattedContent(lesson.content)}
         </div>
 
         {/* Code Examples */}
@@ -162,18 +295,15 @@ export const LessonViewer: React.FC<LessonViewerProps> = ({ lesson, allLessons, 
               </p>
             </div>
             <button
-              onClick={() =>
-                openInIdeWithCode(
-                  lesson.title,
-                  Object.fromEntries(
-                    Object.entries(lesson.starterCode!).map(([name, content]) => [
-                      name,
-                      { name, content, language: name.endsWith('.html') ? 'html' : name.endsWith('.css') ? 'css' : 'javascript' }
-                    ])
-                  ),
-                  lesson.challengeId
-                )
-              }
+              onClick={() => {
+                const starterFiles: Record<string, { name: string; content: string; language: string }> = Object.fromEntries(
+                  Object.entries(lesson.starterCode!).map(([name, content]) => [
+                    name,
+                    { name, content, language: name.endsWith('.html') ? 'html' : name.endsWith('.css') ? 'css' : name.endsWith('.py') ? 'python' : 'javascript' }
+                  ])
+                );
+                openInIdeWithCode(lesson.title, starterFiles, lesson.challengeId);
+              }}
               className="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shrink-0 transition"
             >
               <Code2 className="w-4 h-4" />

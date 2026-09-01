@@ -89,14 +89,16 @@ export const IDEProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const handleOpenIdeEvent = async (e: any) => {
       if (e.detail) {
         const { title, starterFiles, challengeId } = e.detail;
-        const files = starterFiles || {};
+        const files: Record<string, IdeFile> = starterFiles || {};
+        const fileKeys = Object.keys(files);
+
         const newProj: IdeProject = {
           id: `proj-${Date.now()}`,
           name: title || 'Lesson Starter Code',
           description: `Created for ${title}`,
           files,
-          activeFileName: Object.keys(files)[0] || 'index.html',
-          openTabs: Object.keys(files),
+          activeFileName: fileKeys[0] || 'index.html',
+          openTabs: fileKeys.length > 0 ? fileKeys : ['index.html'],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };

@@ -35,6 +35,26 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
   const currentQ = questions[currentIndex];
 
+  const checkOptionIsCorrect = (idx: number): boolean => {
+    if (!currentQ.options || idx < 0 || idx >= currentQ.options.length) return false;
+    const optText = currentQ.options[idx];
+    const correctVal = currentQ.correctAnswer;
+
+    // Direct index match
+    if (typeof correctVal === 'number' && correctVal === idx) return true;
+    if (typeof correctVal === 'string' && !isNaN(Number(correctVal)) && Number(correctVal) === idx) return true;
+
+    // Direct text string match (case-insensitive)
+    if (String(optText).trim().toLowerCase() === String(correctVal).trim().toLowerCase()) return true;
+
+    // Boolean match
+    if (typeof correctVal === 'boolean') {
+      return String(optText).trim().toLowerCase() === String(correctVal).toLowerCase();
+    }
+
+    return false;
+  };
+
   const handleSubmitAnswer = () => {
     if (isAnswerSubmitted) return;
 
@@ -43,7 +63,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
 
     if (currentQ.type === 'mcq' || currentQ.type === 'true_false' || currentQ.type === 'code_quiz') {
       if (selectedOption === null) return;
-      isCorrect = Number(selectedOption) === Number(currentQ.correctAnswer);
+      isCorrect = checkOptionIsCorrect(Number(selectedOption));
       userAnsStr = currentQ.options ? String(currentQ.options[Number(selectedOption)]) : String(selectedOption);
     } else if (currentQ.type === 'short_answer') {
       if (!shortAnswerInput.trim()) return;
@@ -177,7 +197,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({
               <div className="space-y-2">
                 {currentQ.options.map((opt, idx) => {
                   const isSelected = selectedOption === idx;
-                  const isCorrect = Number(currentQ.correctAnswer) === idx;
+                  const isCorrect = checkOptionIsCorrect(idx);
 
                   let optClass = 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-brand-500';
 
