@@ -17,6 +17,7 @@ import { AchievementsView } from './components/achievements/AchievementsView';
 import { SettingsView } from './components/settings/SettingsView';
 
 import { OnboardingView } from './components/auth/OnboardingView';
+import { DevNoticeModal } from './components/common/DevNoticeModal';
 
 const MainViewRouter: React.FC = () => {
   const { activeNav } = useApp();
@@ -86,14 +87,17 @@ const MainAppContent: React.FC = () => {
     );
   }
 
-  if (!profile) {
-    return <OnboardingView />;
-  }
-
   return (
-    <AppLayout>
-      <MainViewRouter />
-    </AppLayout>
+    <>
+      <DevNoticeModal />
+      {!profile ? (
+        <OnboardingView />
+      ) : (
+        <AppLayout>
+          <MainViewRouter />
+        </AppLayout>
+      )}
+    </>
   );
 };
 
