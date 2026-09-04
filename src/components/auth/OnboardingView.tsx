@@ -21,6 +21,7 @@ import { backupService } from '../../services/backupService';
 import { UserProfile, StudentSchedule } from '../../types';
 import { AvatarSelector } from '../common/AvatarSelector';
 import { TimetableBuilder } from '../planner/TimetableBuilder';
+import { PowerOffModal } from '../common/PowerOffModal';
 import { DEFAULT_STUDENT_SCHEDULE } from '../../data/defaultSchedules';
 
 export const OnboardingView: React.FC = () => {
@@ -35,6 +36,7 @@ export const OnboardingView: React.FC = () => {
   const [schedule, setSchedule] = useState<StudentSchedule>(DEFAULT_STUDENT_SCHEDULE);
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
+  const [isPowerOffOpen, setIsPowerOffOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -54,10 +56,7 @@ export const OnboardingView: React.FC = () => {
   ];
 
   const handlePowerOff = () => {
-    try {
-      window.open('', '_self', '');
-      window.close();
-    } catch {}
+    setIsPowerOffOpen(true);
   };
 
   const handleImportClick = () => {
@@ -460,6 +459,12 @@ export const OnboardingView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Power Off Confirmation Modal */}
+      <PowerOffModal
+        isOpen={isPowerOffOpen}
+        onClose={() => setIsPowerOffOpen(false)}
+      />
     </div>
   );
 };

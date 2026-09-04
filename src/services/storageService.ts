@@ -404,6 +404,65 @@ export class StorageService {
   async resetAllData(): Promise<void> {
     await db.clearAll();
   }
+
+  // --- Synchronize & Save All State to Local Storage ---
+  async saveAllToLocalStorage(): Promise<void> {
+    try {
+      const [
+        profile,
+        settings,
+        progress,
+        schedule,
+        ideProjects,
+        managedProjects,
+        plannerTasks,
+        portfolio,
+        achievements,
+        practiceAttempts
+      ] = await Promise.all([
+        this.getProfile(),
+        this.getSettings(),
+        this.getProgress(),
+        this.getSchedule(),
+        this.getIdeProjects(),
+        this.getManagedProjects(),
+        this.getPlannerTasks(),
+        this.getPortfolio(),
+        this.getAchievements(),
+        this.getPracticeAttempts()
+      ]);
+
+      if (profile) localStorage.setItem('skudium_user_profile', JSON.stringify(profile));
+      if (settings) localStorage.setItem('skudium_settings', JSON.stringify(settings));
+      if (progress) localStorage.setItem('skudium_progress', JSON.stringify(progress));
+      if (schedule) localStorage.setItem('skudium_schedule', JSON.stringify(schedule));
+      if (ideProjects) localStorage.setItem('skudium_ide_projects', JSON.stringify(ideProjects));
+      if (managedProjects) localStorage.setItem('skudium_managed_projects', JSON.stringify(managedProjects));
+      if (plannerTasks) localStorage.setItem('skudium_planner_tasks', JSON.stringify(plannerTasks));
+      if (portfolio) localStorage.setItem('skudium_portfolio', JSON.stringify(portfolio));
+      if (achievements) localStorage.setItem('skudium_achievements', JSON.stringify(achievements));
+      if (practiceAttempts) localStorage.setItem('skudium_practice_attempts', JSON.stringify(practiceAttempts));
+
+      const snapshot = {
+        version: '1.0.0',
+        savedAt: new Date().toISOString(),
+        profile,
+        settings,
+        progress,
+        schedule,
+        ideProjects,
+        managedProjects,
+        plannerTasks,
+        portfolio,
+        achievements,
+        practiceAttempts
+      };
+      localStorage.setItem('skudium_poweroff_backup', JSON.stringify(snapshot));
+      localStorage.setItem('skudium_last_saved', new Date().toISOString());
+    } catch (err) {
+      console.error('Failed to save state to localStorage before power off:', err);
+    }
+  }
 }
 
 export const storageService = new StorageService();

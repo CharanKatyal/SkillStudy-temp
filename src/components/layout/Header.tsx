@@ -4,16 +4,18 @@ import { useApp } from '../../context/AppContext';
 import { useData } from '../../context/DataContext';
 import { getAvatarDisplay } from '../../data/defaultAvatars';
 import { Modal } from '../common/Modal';
+import { PowerOffModal } from '../common/PowerOffModal';
 import { TodayTimetableModal } from './TodayTimetableModal';
 
 interface HeaderProps {
   onToggleMobileMenu: () => void;
+  onPowerOff?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
+export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu, onPowerOff }) => {
   const { activeNav, setActiveNav } = useApp();
   const { profile, progress, settings, updateSettings, scheduleStatus } = useData();
-  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+  const [isPowerOffModalOpen, setIsPowerOffModalOpen] = useState(false);
   const [isTodayScheduleOpen, setIsTodayScheduleOpen] = useState(false);
 
   const titles: Record<string, { title: string; subtitle: string }> = {
@@ -33,11 +35,11 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   const avatarInfo = getAvatarDisplay(profile?.avatarUrl, profile?.displayName);
 
   const handlePowerOff = () => {
-    try {
-      window.open('', '_self', '');
-      window.close();
-    } catch {}
-    setIsExitModalOpen(true);
+    if (onPowerOff) {
+      onPowerOff();
+    } else {
+      setIsPowerOffModalOpen(true);
+    }
   };
 
   const toggleTheme = () => {
@@ -181,37 +183,13 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
         onClose={() => setIsTodayScheduleOpen(false)}
       />
 
-      {/* Exit / Power Off Modal (if browser prevents script auto-close) */}
-      <Modal
-        isOpen={isExitModalOpen}
-        onClose={() => setIsExitModalOpen(false)}
-        title="Session Closed"
-        maxWidth="sm"
-      >
-        <div className="space-y-4 text-center py-2">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center border border-rose-500/20 shadow-lg">
-            <Power className="w-8 h-8" />
-          </div>
-
-          <div>
-            <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">
-              Skudium Studio Closed
-            </h4>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
-              All your progress, code, and study notes are securely stored on this device. You can safely close this browser tab now.
-            </p>
-          </div>
-
-          <div className="pt-2 flex justify-center gap-3">
-            <button
-              onClick={() => setIsExitModalOpen(false)}
-              className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-bold shadow transition"
-            >
-              Return to Studio
-            </button>
-          </div>
-        </div>
-      </Modal>
+      {/* Power Off Confirmation & Local Storage Save Modal (used if Header is standalone) */}
+      {!onPowerOff && (
+        <PowerOffModal
+          isOpen={isPowerOffModalOpen}
+          onClose={() => setIsPowerOffModalOpen(false)}
+        />
+      )}
     </>
   );
 };

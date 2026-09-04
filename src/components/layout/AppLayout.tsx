@@ -3,6 +3,7 @@ import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { ToastContainer } from '../common/Toast';
 import { AIAssistantDrawer } from '../ai/AIAssistantDrawer';
+import { PowerOffModal } from '../common/PowerOffModal';
 import { useApp } from '../../context/AppContext';
 
 interface AppLayoutProps {
@@ -12,6 +13,7 @@ interface AppLayoutProps {
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isPowerOffOpen, setIsPowerOffOpen] = useState(false);
   const { toasts, removeToast } = useApp();
 
   return (
@@ -22,6 +24,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           setCollapsed={setCollapsed}
           mobileOpen={mobileOpen}
           setMobileOpen={setMobileOpen}
+          onPowerOff={() => setIsPowerOffOpen(true)}
         />
 
         <div
@@ -29,7 +32,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             collapsed ? 'lg:ml-20' : 'lg:ml-64'
           }`}
         >
-          <Header onToggleMobileMenu={() => setMobileOpen(!mobileOpen)} />
+          <Header
+            onToggleMobileMenu={() => setMobileOpen(!mobileOpen)}
+            onPowerOff={() => setIsPowerOffOpen(true)}
+          />
 
           <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto">
             {children}
@@ -39,6 +45,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       {/* AI Assistant Floating Button */}
       <AIAssistantDrawer />
+
+      {/* Power Off Confirmation Modal */}
+      <PowerOffModal
+        isOpen={isPowerOffOpen}
+        onClose={() => setIsPowerOffOpen(false)}
+      />
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
     </div>
